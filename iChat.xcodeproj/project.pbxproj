@@ -13,6 +13,13 @@
 		ADDCE2B4250BD8A900D67C05 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADDCE2B2250BD8A900D67C05 /* Main.storyboard */; };
 		ADDCE2B9250BD8AB00D67C05 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADDCE2B7250BD8AB00D67C05 /* LaunchScreen.storyboard */; };
 		ADDCE2D2250BE5FD00D67C05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADDCE2D1250BE5FD00D67C05 /* Assets.xcassets */; };
+		ADDCE2D6250BE67800D67C05 /* PTView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDCE2D4250BE67800D67C05 /* PTView.swift */; };
+		ADDCE2D7250BE67800D67C05 /* PTViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADDCE2D5250BE67800D67C05 /* PTViewController.swift */; };
+		ADEE9B73250C8827009E6518 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEE9B72250C8827009E6518 /* String.swift */; };
+		ADEE9B75250C9152009E6518 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEE9B74250C9152009E6518 /* Logging.swift */; };
+		ADEE9B7C250CAB17009E6518 /* Direction.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEE9B7B250CAB17009E6518 /* Direction.swift */; };
+		ADEE9B7E250CB8A2009E6518 /* TypeName.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEE9B7D250CB8A2009E6518 /* TypeName.swift */; };
+		ADEE9B84250CDF0D009E6518 /* ApplicationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEE9B83250CDF0D009E6518 /* ApplicationState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +31,13 @@
 		ADDCE2B8250BD8AB00D67C05 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ADDCE2BA250BD8AB00D67C05 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ADDCE2D1250BE5FD00D67C05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		ADDCE2D4250BE67800D67C05 /* PTView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PTView.swift; sourceTree = "<group>"; };
+		ADDCE2D5250BE67800D67C05 /* PTViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PTViewController.swift; sourceTree = "<group>"; };
+		ADEE9B72250C8827009E6518 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		ADEE9B74250C9152009E6518 /* Logging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logging.swift; sourceTree = "<group>"; };
+		ADEE9B7B250CAB17009E6518 /* Direction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Direction.swift; sourceTree = "<group>"; };
+		ADEE9B7D250CB8A2009E6518 /* TypeName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypeName.swift; sourceTree = "<group>"; };
+		ADEE9B83250CDF0D009E6518 /* ApplicationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +70,9 @@
 		ADDCE2AB250BD8A900D67C05 /* iChat */ = {
 			isa = PBXGroup;
 			children = (
+				ADEE9B78250CA8D7009E6518 /* Enums */,
+				ADEE9B71250C8567009E6518 /* Extensions */,
+				ADDCE2D3250BE66300D67C05 /* ProxyTraceUI */,
 				ADDCE2AC250BD8A900D67C05 /* AppDelegate.swift */,
 				ADDCE2AE250BD8A900D67C05 /* SceneDelegate.swift */,
 				ADDCE2B0250BD8A900D67C05 /* ViewController.swift */,
@@ -65,6 +82,34 @@
 				ADDCE2D1250BE5FD00D67C05 /* Assets.xcassets */,
 			);
 			path = iChat;
+			sourceTree = "<group>";
+		};
+		ADDCE2D3250BE66300D67C05 /* ProxyTraceUI */ = {
+			isa = PBXGroup;
+			children = (
+				ADDCE2D4250BE67800D67C05 /* PTView.swift */,
+				ADDCE2D5250BE67800D67C05 /* PTViewController.swift */,
+			);
+			path = ProxyTraceUI;
+			sourceTree = "<group>";
+		};
+		ADEE9B71250C8567009E6518 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ADEE9B72250C8827009E6518 /* String.swift */,
+				ADEE9B74250C9152009E6518 /* Logging.swift */,
+				ADEE9B7D250CB8A2009E6518 /* TypeName.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ADEE9B78250CA8D7009E6518 /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+				ADEE9B7B250CAB17009E6518 /* Direction.swift */,
+				ADEE9B83250CDF0D009E6518 /* ApplicationState.swift */,
+			);
+			path = Enums;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,7 +183,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADEE9B73250C8827009E6518 /* String.swift in Sources */,
+				ADDCE2D7250BE67800D67C05 /* PTViewController.swift in Sources */,
+				ADEE9B7E250CB8A2009E6518 /* TypeName.swift in Sources */,
 				ADDCE2B1250BD8A900D67C05 /* ViewController.swift in Sources */,
+				ADEE9B7C250CAB17009E6518 /* Direction.swift in Sources */,
+				ADEE9B75250C9152009E6518 /* Logging.swift in Sources */,
+				ADEE9B84250CDF0D009E6518 /* ApplicationState.swift in Sources */,
+				ADDCE2D6250BE67800D67C05 /* PTView.swift in Sources */,
 				ADDCE2AD250BD8A900D67C05 /* AppDelegate.swift in Sources */,
 				ADDCE2AF250BD8A900D67C05 /* SceneDelegate.swift in Sources */,
 			);
@@ -293,6 +345,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
+				OTHER_SWIFT_FLAGS = "-DENABLE_CONSOLE_LOGGING";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.creative-socks.iChat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -313,6 +366,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.0.1;
+				OTHER_SWIFT_FLAGS = "-DENABLE_CONSOLE_LOGGING";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.creative-socks.iChat";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
