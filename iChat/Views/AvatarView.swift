@@ -28,9 +28,6 @@ import UIKit
             userInitialsLabel.text = userInitials
         }
     }
-    private var touchPath: UIBezierPath {
-        return UIBezierPath(roundedRect: bounds, byRoundingCorners: [.bottomLeft, .bottomRight, .topLeft, .topRight], cornerRadii: CGSize(width: bounds.width, height: bounds.width))
-    }
     
     var image: UIImage? {
         didSet {
@@ -118,5 +115,9 @@ extension AvatarView: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         return touchPath.contains(touch.location(in: self))
+    }
+    
+    private var touchPath: UIBezierPath {
+        return UIBezierPath(roundedRect: bounds, cornerRadius: bounds.width / 2)
     }
 }
