@@ -9,14 +9,14 @@
 import UIKit
 
 
-@IBDesignable class AvatarView: PTView {
+@IBDesignable class AvatarView: UIView, INibView {
     
-    private let imageView: UIImageView = {
+    private lazy var imageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         return iv
     }()
-    private let userInitialsLabel: UILabel = {
+    private lazy var userInitialsLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         label.adjustsFontSizeToFitWidth = true
@@ -27,9 +27,6 @@ import UIKit
         didSet {
             userInitialsLabel.text = userInitials
         }
-    }
-    private var touchPath: UIBezierPath {
-        return UIBezierPath(roundedRect: bounds, byRoundingCorners: [.bottomLeft, .bottomRight, .topLeft, .topRight], cornerRadii: CGSize(width: bounds.width, height: bounds.width))
     }
     
     var image: UIImage? {
@@ -51,10 +48,8 @@ import UIKit
     }
     var emptyThumbnailColor = UIColor(hex: "E4E82B") ?? .yellow
     var delegate: AvatarViewDelegate?
-}
-
-extension AvatarView {
-    private func initialSetup(){
+    
+    private func baseSetup(){
         cornerRadius = bounds.width / 2
     }
     
@@ -74,10 +69,12 @@ extension AvatarView {
         userInitialsLabel.isHidden = true
         imageView.isHidden = false
     }
-    
+}
+
+extension AvatarView {
     override func awakeFromNib() {
         super.awakeFromNib()
-        initialSetup()
+        baseSetup()
         addSubviews()
         setupStyleForAppearanceWithoutImage()
         addTapGestureRecognizer()
@@ -88,7 +85,7 @@ extension AvatarView {
     
     override func prepareForInterfaceBuilder() {
         super.prepareForInterfaceBuilder()
-        initialSetup()
+        baseSetup()
         addSubviews()
         setupStyleForAppearanceWithoutImage()
         userName = "Constantine Nikolsky"
@@ -97,10 +94,12 @@ extension AvatarView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        baseSetup()
         imageView.frame = bounds
         
         userInitialsLabel.frame = bounds
-        userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * 0.65, height: bounds.height * 0.65), maxFontSize: 150)
+        
+        userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * 0.6, height: bounds.height * 0.6), maxFontSize: 150)
     }
 }
 
@@ -118,5 +117,9 @@ extension AvatarView: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
         return touchPath.contains(touch.location(in: self))
+    }
+    
+    private var touchPath: UIBezierPath {
+        return UIBezierPath(roundedRect: bounds, cornerRadius: bounds.width / 2)
     }
 }
