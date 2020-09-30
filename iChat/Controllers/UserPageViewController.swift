@@ -9,7 +9,7 @@
 import UIKit
 import Photos
 
-class UserPageViewController: PTViewController {
+class UserPageViewController: PTViewController, IStoryboardViewController {
     
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
