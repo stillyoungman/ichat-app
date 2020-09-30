@@ -29,6 +29,11 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return leadingInset
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavigation()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
@@ -37,15 +42,18 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
         tableView.insetsContentViewsToSafeArea = true
         
+        configureNavigation()
+        setupLeftBarButtonItem()
+        setupRightBarButtonItem()
+    }
+    
+    private func configureNavigation(){
         navigationItem.title = "Tinkoff Chat"
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationItem.searchController = UISearchController()
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
-
-        setupLeftBarButtonItem()
-        setupRightBarButtonItem()
     }
     
     private func setupRightBarButtonItem(){
@@ -78,7 +86,8 @@ extension ConversationsListViewController: ExtendedNavBarDelegate {
 
 extension ConversationsListViewController: AvatarViewDelegate {
     func viewDidTapped() {
-        print("tapped ")
+        let presentedView = UINavigationController(rootViewController: UserPageViewController.fromStoryboard())
+        self.present(presentedView, animated: true)
     }
 }
 
@@ -135,5 +144,15 @@ extension ConversationsListViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
         headerHeight
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        navigationItem.title = nil
+        guard let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
+        cell.setSelected(false, animated: true)
+        
+        let destination = ConversationViewController.fromStoryboard()
+        destination.navigationItem.title = cell.model?.name
+        self.show(destination, sender: nil)
     }
 }

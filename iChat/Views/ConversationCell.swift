@@ -9,6 +9,8 @@
 import UIKit
 
 class ConversationCell: UITableViewCell, INibView {
+    private(set) var model: IConversationInfo?
+    
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var rightChevronView: UIView!
     @IBOutlet private weak var name: UILabel!
@@ -22,6 +24,15 @@ class ConversationCell: UITableViewCell, INibView {
         b.imageView?.contentMode = .scaleAspectFit
         return b
     }()
+    var isOnline: Bool = false {
+        didSet {
+            backgroundColor = isOnline ? .softYellow : .none
+        }
+    }
+    
+    private func updateBackroundColor(){
+        isOnline = !(!isOnline)
+    }
     
     private let lastMessageFontSize: CGFloat = 13
     private let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
@@ -70,11 +81,19 @@ extension ConversationCell {
         super.setSelected(selected, animated: animated)
 
         if(animated) {
-            UIView.animate(withDuration: 0.1, delay: 0.0, options:[], animations: {
-                self.backgroundColor = selected ? self.selectedBackroundColor : self.backgroundColor
+            UIView.animate(withDuration: 0.1, delay: 1.0, options:[], animations: {
+                if selected {
+                    self.backgroundColor = self.selectedBackroundColor
+                } else {
+                    self.updateBackroundColor()
+                }
             }, completion:nil)
         } else {
-            self.backgroundColor = selected ? selectedBackroundColor : self.backgroundColor
+            if selected {
+                self.backgroundColor = self.selectedBackroundColor
+            } else {
+                self.updateBackroundColor()
+            }
         }
     }
 }
@@ -83,7 +102,10 @@ extension ConversationCell: ConfigurableView {
     typealias ConfigurationModel = IConversationInfo
     
     func configure(with model: IConversationInfo) {
+        self.model = model
         self.name.text = model.name
+        self.isOnline = model.isOnline
+        
         if model.hasNoMessages {
             self.lastMessage.text = "No messages yet"
             self.lastMessage.font = noMessagesFont
@@ -98,9 +120,6 @@ extension ConversationCell: ConfigurableView {
         
         avatarView.userName = model.name
         
-        if model.isOnline {
-            backgroundColor = .softYellow
-        }
     }
     
     func configureLastMessageText(_ text: String) -> NSMutableAttributedString {
@@ -109,7 +128,8 @@ extension ConversationCell: ConfigurableView {
         style.lineBreakMode = .byTruncatingTail
         style.lineSpacing = lineSpacing
         
-        attributeString.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: NSMakeRange(0, attributeString.length))
+        attributeString.addAttribute(NSAttributedString.Key.paragraphStyle,
+                                     value: style, range: NSMakeRange(0, attributeString.length))
         
         return attributeString
     }

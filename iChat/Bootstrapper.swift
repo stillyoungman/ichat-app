@@ -14,6 +14,7 @@ class Bootstrapper {
     
     static func setupRootViewController(_ window: UIWindow) {
         window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.fromStoryboard())
+//        window.rootViewController = UINavigationController(rootViewController: ConversationViewController.fromStoryboard())
         window.makeKeyAndVisible()
     }
 }
