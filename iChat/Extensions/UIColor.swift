@@ -41,4 +41,7 @@ extension UIColor {
         
         self.init(red: r, green: g, blue: b, alpha: a)
     }
+    
+    static var softYellow: UIColor { UIColor.yellow.withAlphaComponent(0.1) }
+    static var milkGray: UIColor { (UIColor.init(hex: "3C3C43") ?? UIColor.lightGray).withAlphaComponent(0.6) }
 }
