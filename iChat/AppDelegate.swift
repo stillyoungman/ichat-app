@@ -16,7 +16,7 @@ class AppDelegate: UIResponder {
 }
 
 extension AppDelegate: UIApplicationDelegate {
-   
+    
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         printAppState(from: .notRunning, to: .inactive)
         return true
@@ -24,6 +24,11 @@ extension AppDelegate: UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         printAppState(from: .inactive, to: .inactive)
+        
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        Bootstrapper.setupRootViewController(window)
+        self.window = window
+        
         return true
     }
     
@@ -51,10 +56,10 @@ extension AppDelegate: UIApplicationDelegate {
         "Application moved from '\(from)' to '\(to)': \(functionName)".log()
     }
     
-        func application(_ application: UIApplication, didUpdate userActivity: NSUserActivity) {
-            trace()
-        }
-
+    func application(_ application: UIApplication, didUpdate userActivity: NSUserActivity) {
+        trace()
+    }
+    
     // MARK: UISceneSession Lifecycle
     @available(iOS 13.0, *)
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
