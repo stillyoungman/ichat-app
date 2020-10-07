@@ -8,7 +8,6 @@
 
 import Foundation
 
-/// comment #1
 struct ConversationInfo: IConversationInfo {
     var name: String
     var message: String

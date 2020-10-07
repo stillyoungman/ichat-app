@@ -14,4 +14,10 @@ protocol IConversationInfo {
     var date: Date { get }
     var isOnline: Bool { get }
     var hasUnreadMessages: Bool { get }
+    
+    var uid: String { get }
+}
+
+extension IConversationInfo {
+    var uid: String { "" }
 }
