@@ -8,8 +8,9 @@
 
 import UIKit
 
-
-@IBDesignable class AvatarView: UIView, INibView {
+@IBDesignable class AvatarView: UIView, INibView, IConfigurable {
+    private let fontSizeMultiplier = CGFloat(0.6)
+    private let maxFontSize = CGFloat(150)
     
     private lazy var imageView: UIImageView = {
         let iv = UIImageView()
@@ -29,6 +30,11 @@ import UIKit
         }
     }
     
+    func configure(with model: IAvatarViewModel) {
+        image = model.image
+        userName = model.username
+    }
+    
     var image: UIImage? {
         didSet {
             imageView.image = image
@@ -39,14 +45,14 @@ import UIKit
             }
         }
     }
-    var userName: String? {
+    private var userName: String? {
         didSet {
             guard let userName = userName, !userName.isEmpty else { return }
             let userNameChunks = userName.split(separator: " ").map( { Array($0) })
             userInitials = "\(String(userNameChunks[0][0]).uppercased())\(userNameChunks.count > 1 && userNameChunks[1].count > 1  ? String(userNameChunks[1][0]).uppercased() : "")"
         }
     }
-    var emptyThumbnailColor = UIColor(hex: "E4E82B") ?? .yellow
+    private let emptyThumbnailColor = UIColor(hex: "E4E82B") ?? .yellow
     var delegate: AvatarViewDelegate?
     
     private func baseSetup(){
@@ -71,6 +77,7 @@ import UIKit
     }
 }
 
+// MARK: - UIView
 extension AvatarView {
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -78,17 +85,6 @@ extension AvatarView {
         addSubviews()
         setupStyleForAppearanceWithoutImage()
         addTapGestureRecognizer()
-        #if EASTER_MODE
-        image = UIImage(named: "droid")
-        #endif
-    }
-    
-    override func prepareForInterfaceBuilder() {
-        super.prepareForInterfaceBuilder()
-        baseSetup()
-        addSubviews()
-        setupStyleForAppearanceWithoutImage()
-        userName = "Constantine Nikolsky"
     }
     
     override func layoutSubviews() {
@@ -99,10 +95,21 @@ extension AvatarView {
         
         userInitialsLabel.frame = bounds
         
-        userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * 0.6, height: bounds.height * 0.6), maxFontSize: 150)
+        userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * fontSizeMultiplier,
+                                                height: bounds.height * fontSizeMultiplier),
+                                         maxFontSize: maxFontSize)
+    }
+    
+    override func prepareForInterfaceBuilder() {
+        super.prepareForInterfaceBuilder()
+        baseSetup()
+        addSubviews()
+        setupStyleForAppearanceWithoutImage()
+        userName = "Constantine Nikolsky"
     }
 }
 
+// MARK: - UIGestureRecognizerDelegate
 extension AvatarView: UIGestureRecognizerDelegate {
     private func addTapGestureRecognizer(){
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tap(_:)))

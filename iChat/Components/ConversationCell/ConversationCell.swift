@@ -36,9 +36,9 @@ class ConversationCell: UITableViewCell, INibView {
     
     private let lastMessageFontSize: CGFloat = 13
     private let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
-    lazy var lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
-    lazy var noMessagesFont = UIFont.init(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
-    let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
+    private lazy var lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
+    private lazy var noMessagesFont = UIFont.init(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
+    private let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
     
     private func initialSetup(){
         rightChevronView.addSubview(chevron)
@@ -53,10 +53,10 @@ class ConversationCell: UITableViewCell, INibView {
         backgroundColor = .clear
         lastMessage.font = lastMessageDefaultFont
         lastMessage.textColor = UIColor.milkGray
-        avatarView.userName = nil
     }
 }
 
+// MARK: - UITableViewCell
 extension ConversationCell {
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -98,7 +98,8 @@ extension ConversationCell {
     }
 }
 
-extension ConversationCell: ConfigurableView {
+// MARK: - IConfigurable
+extension ConversationCell: IConfigurable {
     typealias ConfigurationModel = IConversationInfo
     
     func configure(with model: IConversationInfo) {
@@ -118,11 +119,15 @@ extension ConversationCell: ConfigurableView {
             if model.hasUnreadMessages { self.lastMessage.font = lastMessageDefaultFont.bold }
         }
         
-        avatarView.userName = model.name
+        avatarView.configure(with: AvatarViewModel(username: model.name, image: nil))
         
     }
     
-    func configureLastMessageText(_ text: String) -> NSMutableAttributedString {
+    func setModel(_ model: IConversationInfo) {
+        self.model = model
+    }
+    
+    private func configureLastMessageText(_ text: String) -> NSMutableAttributedString {
         let attributeString = NSMutableAttributedString(string: text)
         let style = NSMutableParagraphStyle()
         style.lineBreakMode = .byTruncatingTail
