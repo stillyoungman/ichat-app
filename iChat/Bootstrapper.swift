@@ -28,5 +28,7 @@ class Bootstrapper {
         container.register(ConversationsInfoProvider.instance as IConversationsInfoProvider)
         container.register(DummyConversationsProvider.instance as IConversationsProvider)
         container.register(DummyProfileProvider.init() as IProfileInfoProvider)
+        container.register(ThemeManager.shared as IThemeManager)
+        container.register(ThemeManager.shared as IThemeProvider)
     }
 }

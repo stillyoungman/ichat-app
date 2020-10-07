@@ -30,10 +30,12 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     private var container: IServiceResolver!
     private var dataProvider: IConversationsInfoProvider!
+    private var themeProvider: IThemeProvider!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
         self.dataProvider = container.resolve(for: IConversationsInfoProvider.self)
+        self.themeProvider = container.resolve(for: IThemeProvider.self)
     }
     
     private func configureNavigation(){
@@ -56,10 +58,15 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     private func setupLeftBarButtonItem() {
         let frame = CGRect(x: 0, y: 0, width: 25, height: 25)
-        let iconButton = UIButton(frame: frame)
-        iconButton.setBackgroundImage(#imageLiteral(resourceName: "settings.png"), for: .normal)
+        let iconButton = UIButton(type: .system)
+        
+        iconButton.addTarget(self, action: #selector(presentThemeSettings(_:)), for: .touchUpInside)
+        let image = UIImage(named: "settings")?.withRenderingMode(.alwaysTemplate)
+        iconButton.setBackgroundImage(image, for: .normal)
         let settings = UIBarButtonItem(customView: iconButton)
-        settings.tintColor = UIColor.init(hex: "#545458") ?? UIColor.systemGray.withAlphaComponent(0.65)
+        
+        settings.customView?.tintColor = UIColor.init(hex: "#545458") ?? UIColor.systemGray.withAlphaComponent(0.65)
+
         settings.customView?.translatesAutoresizingMaskIntoConstraints = false
         settings.customView?.heightAnchor.constraint(equalToConstant: frame.size.height).isActive = true
         settings.customView?.widthAnchor.constraint(equalToConstant: frame.size.width).isActive = true
@@ -74,6 +81,35 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         let viewModel = ConversationViewModel(title: conversationInfo.name, conversation: conversation)
         destination.configure(with: viewModel)
         self.show(destination, sender: nil)
+    }
+    
+    @objc func presentThemeSettings(_ btn: AnyObject) {
+        navigationItem.title = nil
+        let destination = ThemesViewController.instantiate(container: container)
+        ///comment: RC может возникнуть в случае если два контроллера будут держать сильные ссылки друг на друга
+        ///даже если closure themeChanged будет держать сильную ссылку на ConversationsListViewController
+        ///после того как ThemesViewController закроется ссылка на clsosure обнулиться и следовательно closure будет уничтожена,
+        ///затем счетчик на ConversationsListViewController будет уменьшен
+        destination.themeChanged = { [weak self] _ in
+            self?.setupAppearance()
+            self?.tableView.reloadData()
+        }
+        destination.delegate = self
+        self.show(destination, sender: nil)
+    }
+    
+    func setupAppearance() {
+        view.backgroundColor = themeProvider.value.background
+        navigationItem.leftBarButtonItem?.tintColor = themeProvider.value.titnColor
+        navigationItem.leftBarButtonItem?.customView?.tintColor = themeProvider.value.titnColor
+        navigationController?.navigationBar.barTintColor = themeProvider.value.titnColor
+        navigationController?.navigationBar.tintColor = themeProvider.value.titnColor
+    }
+}
+
+extension ConversationsListViewController: ThemesPickerDelegate {
+    func themeChanged(_ mode: ThemeMode) {
+        print("theme changed: \(mode)")
     }
 }
 
@@ -112,6 +148,8 @@ extension ConversationsListViewController {
         configureNavigation()
         setupLeftBarButtonItem()
         setupRightBarButtonItem()
+        
+        setupAppearance()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -144,6 +182,7 @@ extension ConversationsListViewController: UITableViewDataSource  {
             else { fatalError("Cast to ConversationCell failed.") }
         cell.configure(with:
             dataProvider.conversations(for: ConversationType.parse(indexPath.section))[indexPath.row])
+        cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }
     
@@ -162,7 +201,9 @@ extension ConversationsListViewController: UITableViewDelegate {
             as? HeaderView else {
                 fatalError("Cast to HeaderView failed.")
         }
-        header.configure(with: ConversationType.parse(section).toString())
+        header.configure(with: HeaderModel(title: ConversationType.parse(section).toString(),
+                                           mode: themeProvider.mode,
+                                           theme: themeProvider.value))
         header.leadingInset = headerLeadingInset
         return header
     }

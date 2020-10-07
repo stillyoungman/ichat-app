@@ -9,8 +9,8 @@
 import UIKit
 
 class MessageCell: UITableViewCell {
-    private let outputMessageColor = UIColor.init(hex: "#DCF7C5") ?? UIColor.systemGreen
-    private let inputMessageColor = UIColor.init(hex: "#DFDFDF") ?? UIColor.systemGray
+    private var outputMessageColor = UIColor.init(hex: "#DCF7C5") ?? UIColor.systemGreen
+    private var inputMessageColor = UIColor.init(hex: "#DFDFDF") ?? UIColor.systemGray
     
     private let bubbleMaxWidthMultiplier: CGFloat = 0.7
     
@@ -80,6 +80,7 @@ class MessageCell: UITableViewCell {
     private func initialSetup(){
         selectionStyle = .none
         bubble.contentView = textView
+        backgroundColor = .none
         
         Utils.debug {
             backgroundColor = .systemPink
@@ -94,6 +95,12 @@ class MessageCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+    }
+    
+    func apply(_ theme: IApplicationTheme, for mode: ThemeMode) {
+        outputMessageColor = theme.outgoingBubble
+        inputMessageColor = theme.incomingBubble
+        textView.textColor = theme.primaryText
     }
 }
 

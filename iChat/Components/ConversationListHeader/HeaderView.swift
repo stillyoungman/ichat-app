@@ -10,9 +10,13 @@ import Foundation
 import UIKit
 
 class HeaderView: UITableViewHeaderFooterView {
-    lazy var effect: UIVisualEffectView = {
+    lazy var lightEffect: UIVisualEffectView = {
         let view = UIVisualEffectView(effect: UIBlurEffect(style: .light))
         view.backgroundColor = UIColor.white.withAlphaComponent(0.8)
+        return view
+    }()
+    lazy var darkEffect: UIVisualEffectView = {
+        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
         return view
     }()
     lazy var label: UILabel = UILabel()
@@ -34,12 +38,20 @@ class HeaderView: UITableViewHeaderFooterView {
     }
     
     private func initialSetup() {
-        backgroundView = effect
+
         addSubview(label)
     }
     
-    func configure(with title: String) {
-        label.text = title
+    private func setupAppearance(for model: HeaderModel) {
+        backgroundView = model.mode == .night ? darkEffect : lightEffect
+        label.textColor = model.theme.primaryText
+    }
+}
+
+extension HeaderView: IConfigurable {
+    func configure(with model: HeaderModel) {
+        label.text = model.title
+        setupAppearance(for: model)
     }
 }
 

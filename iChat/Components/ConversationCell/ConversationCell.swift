@@ -17,7 +17,7 @@ class ConversationCell: UITableViewCell, INibView {
     @IBOutlet private weak var time: UILabel!
     @IBOutlet private weak var lastMessage: UILabel!
     lazy var chevron: UIButton = {
-        var b = UIButton(type: .custom)
+        var b = UIButton(type: .system)
         b.tintColor = .milkGray
         b.setImage(#imageLiteral(resourceName: "right.png"), for: .normal)
         b.backgroundColor = .none
@@ -53,6 +53,17 @@ class ConversationCell: UITableViewCell, INibView {
         backgroundColor = .clear
         lastMessage.font = lastMessageDefaultFont
         lastMessage.textColor = UIColor.milkGray
+    }
+    
+    public func apply(_ theme: IApplicationTheme, for mode: ThemeMode) {
+        if mode == .night {
+            chevron.tintColor = theme.titnColor
+        }
+        
+        
+        name.textColor = theme.primaryText
+        time.textColor = theme.secondaryText
+        lastMessage.textColor = theme.secondaryText
     }
 }
 

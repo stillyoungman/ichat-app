@@ -12,10 +12,10 @@ import UIKit
 class ConversationViewController: UIViewController, IStoryboardViewController, IConfigurable {
     @IBOutlet weak var tableView: UITableView!
     var model: IConversationViewModel!
-    var themeManager: AnyObject!
+    var themeManager: IThemeProvider!
     
     func setupDependencies(with container: IServiceResolver) {
-        themeManager = nil
+        themeManager = container.resolve(for: IThemeProvider.self)
     }
     
     func configure(with model: IConversationViewModel) {
@@ -28,7 +28,7 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
         
         configureTableView()
         configureNavigation()
-        setupTheme()
+        setupAppearance()
     }
     
     private func configureNavigation(){
@@ -48,8 +48,9 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
         tableView.transform = CGAffineTransform(rotationAngle: CGFloat.pi)
     }
     
-    private func setupTheme() {
-        // TODO: Add implementation
+    private func setupAppearance() {
+        view.backgroundColor = themeManager.value.background
+        tableView.backgroundColor = themeManager.value.background
     }
 }
 
@@ -66,6 +67,7 @@ extension ConversationViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: MessageCell.typeName) as? MessageCell
             else { fatalError("Unable cast the cell to \(MessageCell.typeName)") }
         
+        cell.apply(themeManager.value, for: themeManager.mode)
         cell.configure(with: model.conversation.getMessage(for: indexPath))
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
 

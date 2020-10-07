@@ -22,9 +22,11 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     
     private var model: IProfileInfo!
     private var container: IServiceResolver!
+    private var theme: IThemeProvider!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
+        self.theme = container.resolve(for: IThemeProvider.self)
     }
     
     func setModel(_ model: IProfileInfo) {
@@ -87,8 +89,17 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     }
     
     private func initialSetup() {
-        saveButton.backgroundColor = UIColor(hex: "#F6F6F6")
+        view.backgroundColor = theme.value.background
+        
+        let tintColor = theme.mode == .night ? UIColor(hex: "#0A84FF") : UIColor(hex: "007AFF")
+        saveButton.backgroundColor = theme.mode == .night ? UIColor(hex: "#1B1B1B") : UIColor(hex: "#F6F6F6")
+        saveButton.tintColor = tintColor
         saveButton.cornerRadius = 14
+        editButton.tintColor = tintColor
+        
+        userNameLabel.textColor = theme.value.primaryText
+        roleLabel.textColor = theme.value.primaryText
+        locationLabel.textColor = theme.value.primaryText
     }
     
     func configure(with model: IProfileInfo) {
