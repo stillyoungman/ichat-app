@@ -18,7 +18,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     private let numberOfSections = 2
     private let cellIdentifier = ConversationCell.typeName
     private let headerIdentifier = HeaderView.typeName
-    private let dataProvider = ConversationsProvider.instance
     
     private var headerLeadingInset: CGFloat {
         var leadingInset: CGFloat = tableCellLeadingInset
@@ -29,22 +28,12 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return leadingInset
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        configureNavigation()
-    }
+    private var container: IServiceResolver!
+    private var dataProvider: IConversationsInfoProvider!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(ConversationCell.nib, forCellReuseIdentifier: cellIdentifier)
-        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
-        tableView.insetsContentViewsToSafeArea = true
-        
-        configureNavigation()
-        setupLeftBarButtonItem()
-        setupRightBarButtonItem()
+    func setupDependencies(with container: IServiceResolver) {
+        self.container = container
+        self.dataProvider = container.resolve(for: IConversationsInfoProvider.self)
     }
     
     private func configureNavigation(){
@@ -58,9 +47,10 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     private func setupRightBarButtonItem(){
         let aView = AvatarView.fromNib()
+        let profileProvider: IProfileInfoProvider = container.resolve()
+        aView.configure(with: profileProvider.profile)
         aView.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
         aView.delegate = self
-        aView.userName = "Constantine Nikolsky"
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: aView)
     }
     
@@ -75,6 +65,16 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         settings.customView?.widthAnchor.constraint(equalToConstant: frame.size.width).isActive = true
         navigationItem.leftBarButtonItem = settings
     }
+    
+    private func presentConversation(for conversationInfo: IConversationInfo) {
+        navigationItem.title = nil
+        let destination = ConversationViewController.instantiate(container: container)
+        let conversationsProvider: IConversationsProvider = container.resolve()
+        let conversation = conversationsProvider.conversation(for: conversationInfo.uid)
+        let viewModel = ConversationViewModel(title: conversationInfo.name, conversation: conversation)
+        destination.configure(with: viewModel)
+        self.show(destination, sender: nil)
+    }
 }
 
 
@@ -86,12 +86,39 @@ extension ConversationsListViewController: ExtendedNavBarDelegate {
 
 extension ConversationsListViewController: AvatarViewDelegate {
     func viewDidTapped() {
-        let presentedView = UINavigationController(rootViewController: UserPageViewController.fromStoryboard())
-        self.present(presentedView, animated: true)
+        presentUserPageController()
+    }
+    
+    private func presentUserPageController() {
+        let profileInfoProvider: IProfileInfoProvider = container.resolve()
+        let userPageVC = UserPageViewController.instantiate(container: container,
+                                                            with: profileInfoProvider.profile)
+        let presentedView = UINavigationController(rootViewController: userPageVC)
+        self.present(presentedView, animated: true) {
+        }
     }
 }
 
+// MARK: - UIViewController
 extension ConversationsListViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(ConversationCell.nib, forCellReuseIdentifier: cellIdentifier)
+        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
+        tableView.insetsContentViewsToSafeArea = true
+        
+        configureNavigation()
+        setupLeftBarButtonItem()
+        setupRightBarButtonItem()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        configureNavigation()
+        
+    }
     
     ///Updates leading inset of tableViewHeader when screen orientation was changed
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -106,6 +133,7 @@ extension ConversationsListViewController {
     }
 }
 
+// MARK: - UITableViewDataSource
 extension ConversationsListViewController: UITableViewDataSource  {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         dataProvider.conversations(for: ConversationType.parse(section)).count
@@ -121,6 +149,7 @@ extension ConversationsListViewController: UITableViewDataSource  {
     
 }
 
+// MARK: - UITableViewDelegate
 extension ConversationsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { rowHeight }
     
@@ -147,12 +176,12 @@ extension ConversationsListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        navigationItem.title = nil
         guard let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
         cell.setSelected(false, animated: true)
         
-        let destination = ConversationViewController.fromStoryboard()
-        destination.navigationItem.title = cell.model?.name
-        self.show(destination, sender: nil)
+        guard let conversationInfo = cell.model
+            else { assert(false, "Unable to unwrap ConversationInfo."); return }
+        
+        presentConversation(for: conversationInfo)
     }
 }
