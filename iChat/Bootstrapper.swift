@@ -12,9 +12,21 @@ import UIKit
 class Bootstrapper {
     private init() { }
     
+    static let container: IContainer = {
+        let container = Container()
+        configure(container)
+        return container
+    }()
+    
     static func setupRootViewController(_ window: UIWindow) {
-        window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.fromStoryboard())
-//        window.rootViewController = UINavigationController(rootViewController: ConversationViewController.fromStoryboard())
+        window.rootViewController = AppNavigationViewController
+            .create(withRoot: ConversationsListViewController.instantiate(container: container))
         window.makeKeyAndVisible()
+    }
+    
+    private static func configure(_ container: IContainer) {
+        container.register(ConversationsInfoProvider.instance as IConversationsInfoProvider)
+        container.register(DummyConversationsProvider.instance as IConversationsProvider)
+        container.register(DummyProfileProvider.init() as IProfileInfoProvider)
     }
 }
