@@ -9,19 +9,9 @@
 import UIKit
 import Photos
 
-class UserPageViewController: PTViewController, IStoryboardViewController {
-    
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-        print(editButton.frame)
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        ///3.2: не в одном из конструкторов нельзя получить доступ к значениям помеченным атрибутом @IBOutlet
-        ///за инициализацию этих значений отвечает метод loadView(). Метод viewDidLoad гарантирует что все subview загружены
-        //editButton.frame.toString().log()
-    }
+// TODO: Handle avatar save
+// TODO: Add remove image
+class UserPageViewController: UIViewController, IStoryboardViewController, IConfigurable {
     
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var editButton: UIButton!
@@ -30,18 +20,25 @@ class UserPageViewController: PTViewController, IStoryboardViewController {
     @IBOutlet weak var roleLabel: UILabel!
     @IBOutlet weak var locationLabel: UILabel!
     
+    private var model: IProfileInfo!
+    private var container: IServiceResolver!
+    
+    func setupDependencies(with container: IServiceResolver) {
+        self.container = container
+    }
+    
+    func setModel(_ model: IProfileInfo) {
+        self.model = model
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         initialSetup()
-        ///3.3
-        editButton.frame.toString().log()
+        configure(with: model)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        ///3.4 возможно, причина в том что между viewDidLoad и viewDidAppear вызывается метод layoutSubviews()
-        ///который располагает views исходя из ограничений наложенных на них
-        editButton.frame.toString().log()
     }
     
     @IBAction func editTouchUpInside(_ sender: UIButton) {
@@ -90,19 +87,15 @@ class UserPageViewController: PTViewController, IStoryboardViewController {
     }
     
     private func initialSetup() {
-        #if EASTER_MODE
-        avatarView.userName = "Constantine Nikolsky"
-        userNameLabel.text = "Constantine Nikolsky"
-        roleLabel.text = "Junior iOS developer"
-        #else
-        avatarView.userName = "Marina Dudarenko"
-        userNameLabel.text = "Marina Dudarenko"
-        roleLabel.text = "UI/UX designer, web-designer"
-        #endif
-        
-        locationLabel.text = "Moscow, Russia"
         saveButton.backgroundColor = UIColor(hex: "#F6F6F6")
         saveButton.cornerRadius = 14
+    }
+    
+    func configure(with model: IProfileInfo) {
+        avatarView.configure(with: model)
+        userNameLabel.text = model.username
+        roleLabel.text = model.description
+        locationLabel.text = model.location
     }
 }
 
