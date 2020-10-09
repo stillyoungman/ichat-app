@@ -39,16 +39,18 @@ extension ThemeManager {
                          primaryText: .black,
                          secondaryText: UIColor.init(hex: "#3C3C43")!,
                          background: .white,
-                         titnColor: .gray)
+                         titnColor: .gray,
+                         navTintColor: .black)
     }
     
     var day: ApplicationTheme {
         var t = ApplicationTheme(incomingBubble: UIColor.init(hex: "#DFDFDF")!,
-        outgoingBubble: UIColor.init(hex: "#4389F9")!,
+        outgoingBubble: UIColor.init(hex: "#4389F9")!.withAlphaComponent(0.85),
         primaryText: .black,
         secondaryText: UIColor.init(hex: "#3C3C43")!,
         background: .white,
-        titnColor: .gray)
+        titnColor: .gray,
+        navTintColor: .systemBlue)
         t.outgointText = .white
         return t
     }
@@ -58,8 +60,10 @@ extension ThemeManager {
                      outgoingBubble: UIColor.init(hex: "#5C5C5C")!,
                      primaryText: .white,
                      secondaryText: .white,
-                     background: .black,
-                     titnColor: .white)
+//                     background: UIColor.init(hex: "#2c3e50")!,
+                     background: UIColor.init(hex: "#3d3d3d")!,
+                     titnColor: .white,
+                     navTintColor: .white)
     }
 }
 
@@ -71,6 +75,7 @@ protocol IApplicationTheme {
     var secondaryText: UIColor { get }
     var background: UIColor { get }
     var titnColor: UIColor { get }
+    var navTintColor: UIColor { get }
 }
 
 struct ApplicationTheme: IApplicationTheme {
@@ -81,6 +86,7 @@ struct ApplicationTheme: IApplicationTheme {
     var secondaryText: UIColor
     var background: UIColor
     var titnColor: UIColor
+    var navTintColor: UIColor
     
 }
 

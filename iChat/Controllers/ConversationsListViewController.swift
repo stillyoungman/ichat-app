@@ -45,6 +45,8 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .always
+        
+        navigationController?.setupAppearance(with: themeProvider)
     }
     
     private func setupRightBarButtonItem(){
@@ -64,9 +66,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         let image = UIImage(named: "settings")?.withRenderingMode(.alwaysTemplate)
         iconButton.setBackgroundImage(image, for: .normal)
         let settings = UIBarButtonItem(customView: iconButton)
-        
-        settings.customView?.tintColor = UIColor.init(hex: "#545458") ?? UIColor.systemGray.withAlphaComponent(0.65)
-
         settings.customView?.translatesAutoresizingMaskIntoConstraints = false
         settings.customView?.heightAnchor.constraint(equalToConstant: frame.size.height).isActive = true
         settings.customView?.widthAnchor.constraint(equalToConstant: frame.size.width).isActive = true
@@ -91,8 +90,9 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         ///после того как ThemesViewController закроется ссылка на clsosure обнулиться и следовательно closure будет уничтожена,
         ///затем счетчик на ConversationsListViewController будет уменьшен
         destination.themeChanged = { [weak self] _ in
-            self?.setupAppearance()
-            self?.tableView.reloadData()
+            guard let sSelf = self else { return }
+            sSelf.setupAppearance()
+            sSelf.tableView.reloadData()
         }
         destination.delegate = self
         self.show(destination, sender: nil)
@@ -100,10 +100,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     func setupAppearance() {
         view.backgroundColor = themeProvider.value.background
-        navigationItem.leftBarButtonItem?.tintColor = themeProvider.value.titnColor
-        navigationItem.leftBarButtonItem?.customView?.tintColor = themeProvider.value.titnColor
-        navigationController?.navigationBar.barTintColor = themeProvider.value.titnColor
-        navigationController?.navigationBar.tintColor = themeProvider.value.titnColor
+        navigationController?.setupAppearance(with: themeProvider)
     }
 }
 
@@ -129,8 +126,9 @@ extension ConversationsListViewController: AvatarViewDelegate {
         let profileInfoProvider: IProfileInfoProvider = container.resolve()
         let userPageVC = UserPageViewController.instantiate(container: container,
                                                             with: profileInfoProvider.profile)
-        let presentedView = UINavigationController(rootViewController: userPageVC)
-        self.present(presentedView, animated: true) {
+        let presentingView = UINavigationController(rootViewController: userPageVC)
+        presentingView.setupAppearance(with: themeProvider)
+        self.present(presentingView, animated: true) {
         }
     }
 }

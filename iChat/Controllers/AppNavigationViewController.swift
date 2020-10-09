@@ -21,3 +21,24 @@ class AppNavigationViewController: UINavigationController {
         visibleViewController?.additionalSafeAreaInsets.top = 7
     }
 }
+
+extension UINavigationController {
+    func setupAppearance(with themeProvider: IThemeProvider) {
+        let mode = themeProvider.mode
+        let theme = themeProvider.value
+        
+        navigationItem.leftBarButtonItem?.tintColor = theme.navTintColor
+        navigationItem.leftBarButtonItem?.customView?.tintColor = theme.navTintColor
+        navigationBar.tintColor = theme.navTintColor
+        
+        navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: theme.primaryText]
+        navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: theme.primaryText]
+        
+        if mode == .night {
+            navigationBar.barStyle = .blackTranslucent
+        }
+        else {
+            navigationBar.barStyle = .default
+        }
+    }
+}
