@@ -18,7 +18,7 @@ class AppNavigationViewController: UINavigationController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        visibleViewController?.additionalSafeAreaInsets.top = 7
+//        visibleViewController?.additionalSafeAreaInsets.top = 7
     }
 }
 

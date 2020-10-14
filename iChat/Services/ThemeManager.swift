@@ -14,7 +14,9 @@ class ThemeManager: IThemeManager {
     
     var mode: ThemeMode {
         didSet {
-            UserDefaults.standard.set(String(mode.rawValue), forKey: modeKey)
+            DQ.global().async {
+                UserDefaults.standard.set(String(self.mode.rawValue), forKey: self.modeKey)
+            }
         }
     }
     var value: IApplicationTheme {
@@ -59,7 +61,7 @@ extension ThemeManager {
     ApplicationTheme(incomingBubble: UIColor.init(hex: "#2E2E2E")!,
                      outgoingBubble: UIColor.init(hex: "#5C5C5C")!,
                      primaryText: .white,
-                     secondaryText: .white,
+                     secondaryText: UIColor.init(hex: "#D0D3D4")!,
 //                     background: UIColor.init(hex: "#2c3e50")!,
                      background: UIColor.init(hex: "#3d3d3d")!,
                      titnColor: .white,
