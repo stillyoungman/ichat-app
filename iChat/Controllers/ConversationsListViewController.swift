@@ -12,6 +12,15 @@ import UIKit
 class ConversationsListViewController: UIViewController, IStoryboardViewController, UINavigationControllerDelegate {
     @IBOutlet private var tableView: UITableView!
     
+    lazy var avatarView: AvatarView = {
+        let aView = AvatarView.fromNib()
+        let profileProvider: IProfileInfoProvider = container.resolve()
+        aView.configure(with: profileProvider.profile)
+        aView.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
+        aView.delegate = self
+        return aView
+    }()
+    
     private let rowHeight = CGFloat(89);
     private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
@@ -49,13 +58,10 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationController?.setupAppearance(with: themeProvider)
     }
     
+    
+    
     private func setupRightBarButtonItem(){
-        let aView = AvatarView.fromNib()
-        let profileProvider: IProfileInfoProvider = container.resolve()
-        aView.configure(with: profileProvider.profile)
-        aView.bounds = CGRect(x: 0, y: 0, width: 40, height: 40)
-        aView.delegate = self
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: aView)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatarView)
     }
     
     private func setupLeftBarButtonItem() {
@@ -110,13 +116,6 @@ extension ConversationsListViewController: ThemesPickerDelegate {
     }
 }
 
-
-extension ConversationsListViewController: ExtendedNavBarDelegate {
-    func heightWasChanged(_ height: CGFloat) {
-        print(height)
-    }
-}
-
 extension ConversationsListViewController: AvatarViewDelegate {
     func viewDidTapped() {
         presentUserPageController()
@@ -128,8 +127,11 @@ extension ConversationsListViewController: AvatarViewDelegate {
                                                             with: profileInfoProvider.profile)
         let presentingView = UINavigationController(rootViewController: userPageVC)
         presentingView.setupAppearance(with: themeProvider)
-        self.present(presentingView, animated: true) {
+        userPageVC.profileHasBeenChanged = { [weak self] p in
+            DQ.main.async { self?.avatarView.image = p.image }
         }
+        
+        self.present(presentingView, animated: true)
     }
 }
 
@@ -179,7 +181,7 @@ extension ConversationsListViewController: UITableViewDataSource  {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? ConversationCell
             else { fatalError("Cast to ConversationCell failed.") }
         cell.configure(with:
-            dataProvider.conversations(for: ConversationType.parse(indexPath.section))[indexPath.row])
+            dataProvider.conversations(for: ConversationType.parse(indexPath.section))[AnyIndex(indexPath.row)])
         cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }

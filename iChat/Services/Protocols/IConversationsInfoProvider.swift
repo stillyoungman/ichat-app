@@ -9,6 +9,6 @@
 import Foundation
 
 protocol IConversationsInfoProvider {
-    func conversations(for type: ConversationType) -> Array<IConversationInfo>
+    func conversations(for type: ConversationType) -> AnyCollection<IConversationInfo>
 }
 

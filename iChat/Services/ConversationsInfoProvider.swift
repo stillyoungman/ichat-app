@@ -98,11 +98,11 @@ class ConversationsInfoProvider {
 }
 
 extension ConversationsInfoProvider: IConversationsInfoProvider {
-    func conversations(for type: ConversationType) -> Array<IConversationInfo> {
+    func conversations(for type: ConversationType) -> AnyCollection<IConversationInfo> {
         switch type {
-        case .online: return onlineConversations
-        case .history: return historyConversations
-        case .undefined: return [ConversationInfo]()
+        case .online: return AnyCollection(onlineConversations)
+        case .history: return AnyCollection(historyConversations)
+        case .undefined: return AnyCollection([ConversationInfo]())
         }
     }
 }

@@ -11,7 +11,8 @@ import UIKit
 
 class DummyProfileProvider: IProfileInfoProvider {
     let profile: IProfileInfo = ProfileInfo(username: "Constantine Nikolsky",
-                              description: "Junior iOS developer",
+                              about: "Junior iOS developer",
                               location: "Moscow, Russia",
                               image: UIImage(named: "droid"))
 }
+
