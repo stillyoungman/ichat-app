@@ -21,6 +21,31 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return aView
     }()
     
+    lazy var newChannelAlertController: UIAlertController = {
+        let alertController = UIAlertController(title: "New channel", message: "Please, enter name of the channel:", preferredStyle: .alert)
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            alertController.textFields?.first?.text = nil
+        }
+        
+        alertController.addAction(cancel)
+        alertController.addAction(self.addChannelAction)
+        
+        alertController.addTextField { tf in
+            tf.addTarget(self, action: #selector(self.newChannelTextFieldValueChanged), for: .editingChanged)
+        }
+        
+        return alertController
+    }()
+    
+    lazy var addChannelAction: UIAlertAction = {
+        let add = UIAlertAction(title: "Create", style: .default) { [weak self] _ in
+            self?.newChannelAlertController.textFields?.first?.text = nil
+        }
+        add.isEnabled = false
+        return add
+    }()
+    
     private let rowHeight = CGFloat(89)
     private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
@@ -48,7 +73,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     }
     
     private func configureNavigation() {
-        navigationItem.title = "Tinkoff Chat"
+        navigationItem.title = "Channels"
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationItem.searchController = UISearchController()
         navigationItem.hidesSearchBarWhenScrolling = true
@@ -59,7 +84,9 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     }
     
     private func setupRightBarButtonItem() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatarView)
+        let avatarButton = UIBarButtonItem(customView: avatarView)
+        let newChannelButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(presentNewChannelAlert(_:)))
+        navigationItem.rightBarButtonItems = [avatarButton, newChannelButton]
     }
     
     private func setupLeftBarButtonItem() {
@@ -89,10 +116,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     @objc func presentThemeSettings(_ btn: AnyObject) {
         navigationItem.title = nil
         let destination = ThemesViewController.instantiate(container: container)
-        ///comment: RC может возникнуть в случае если два контроллера будут держать сильные ссылки друг на друга
-        ///даже если closure themeChanged будет держать сильную ссылку на ConversationsListViewController
-        ///после того как ThemesViewController закроется ссылка на clsosure обнулиться и следовательно closure будет уничтожена,
-        ///затем счетчик на ConversationsListViewController будет уменьшен
         destination.themeChanged = { [weak self] _ in
             guard let sSelf = self else { return }
             sSelf.setupAppearance()
@@ -100,6 +123,13 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         }
         destination.delegate = self
         self.show(destination, sender: nil)
+    }
+    
+    @objc func presentNewChannelAlert(_ btn: AnyObject) {
+        present(newChannelAlertController, animated: true)
+    }
+    @objc func newChannelTextFieldValueChanged(sender: UITextField) {
+        addChannelAction.isEnabled = sender.text?.count ?? 0 > 0
     }
     
     func setupAppearance() {
@@ -222,5 +252,18 @@ extension ConversationsListViewController: UITableViewDelegate {
             else { assert(false, "Unable to unwrap ConversationInfo."); return }
         
         presentConversation(for: conversationInfo)
+    }
+}
+
+import Combine
+class BlockObject: NSObject {
+    let block: () -> Void
+
+    init(block: @escaping () -> Void) {
+        self.block = block
+    }
+
+    @objc dynamic func execute() {
+        block()
     }
 }
