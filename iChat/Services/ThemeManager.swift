@@ -28,7 +28,7 @@ class ThemeManager: IThemeManager {
     }
     
     private init() {
-        mode = ThemeMode.init(rawValue: UserDefaults.standard.integer(forKey: modeKey)) ?? .classic
+        mode = ThemeMode(rawValue: UserDefaults.standard.integer(forKey: modeKey)) ?? .classic
     }
     
     static let shared = ThemeManager()
@@ -36,20 +36,20 @@ class ThemeManager: IThemeManager {
 
 extension ThemeManager {
     var classic: ApplicationTheme {
-        ApplicationTheme(incomingBubble: UIColor.init(hex: "#DFDFDF")!,
-                         outgoingBubble: UIColor.init(hex: "#DCF7C5")!,
+        ApplicationTheme(incomingBubble: UIColor(hex: "#DFDFDF")!,
+                         outgoingBubble: UIColor(hex: "#DCF7C5")!,
                          primaryText: .black,
-                         secondaryText: UIColor.init(hex: "#3C3C43")!,
+                         secondaryText: UIColor(hex: "#3C3C43")!,
                          background: .white,
                          titnColor: .gray,
                          navTintColor: .black)
     }
     
     var day: ApplicationTheme {
-        var t = ApplicationTheme(incomingBubble: UIColor.init(hex: "#DFDFDF")!,
-        outgoingBubble: UIColor.init(hex: "#4389F9")!.withAlphaComponent(0.85),
+        var t = ApplicationTheme(incomingBubble: UIColor(hex: "#DFDFDF")!,
+        outgoingBubble: UIColor(hex: "#4389F9")!.withAlphaComponent(0.85),
         primaryText: .black,
-        secondaryText: UIColor.init(hex: "#3C3C43")!,
+        secondaryText: UIColor(hex: "#3C3C43")!,
         background: .white,
         titnColor: .gray,
         navTintColor: .systemBlue)
@@ -58,12 +58,12 @@ extension ThemeManager {
     }
     
     var night: ApplicationTheme {
-    ApplicationTheme(incomingBubble: UIColor.init(hex: "#2E2E2E")!,
-                     outgoingBubble: UIColor.init(hex: "#5C5C5C")!,
+    ApplicationTheme(incomingBubble: UIColor(hex: "#2E2E2E")!,
+                     outgoingBubble: UIColor(hex: "#5C5C5C")!,
                      primaryText: .white,
-                     secondaryText: UIColor.init(hex: "#D0D3D4")!,
-//                     background: UIColor.init(hex: "#2c3e50")!,
-                     background: UIColor.init(hex: "#3d3d3d")!,
+                     secondaryText: UIColor(hex: "#D0D3D4")!,
+//                     background: UIColor(hex: "#2c3e50")!,
+                     background: UIColor(hex: "#3d3d3d")!,
                      titnColor: .white,
                      navTintColor: .white)
     }
@@ -83,7 +83,7 @@ protocol IApplicationTheme {
 struct ApplicationTheme: IApplicationTheme {
     var incomingBubble: UIColor
     var outgoingBubble: UIColor
-    var outgointText: UIColor? = nil
+    var outgointText: UIColor?
     var primaryText: UIColor
     var secondaryText: UIColor
     var background: UIColor

@@ -21,6 +21,3 @@ protocol IProfileInfo: IUsername, IOptionalImage {
     var about: String { get }
     var location: String { get }
 }
-
-
-

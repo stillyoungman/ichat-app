@@ -48,29 +48,29 @@ import UIKit
     private var userName: String? {
         didSet {
             guard let userName = userName, !userName.isEmpty else { return }
-            let userNameChunks = userName.split(separator: " ").map( { Array($0) })
-            userInitials = "\(String(userNameChunks[0][0]).uppercased())\(userNameChunks.count > 1 && userNameChunks[1].count > 1  ? String(userNameChunks[1][0]).uppercased() : "")"
+            let userNameChunks = userName.split(separator: " ").map({ Array($0) })
+            userInitials = "\(String(userNameChunks[0][0]).uppercased())\(userNameChunks.count > 1 && userNameChunks[1].count > 1 ? String(userNameChunks[1][0]).uppercased() : "")"
         }
     }
     private let emptyThumbnailColor = UIColor(hex: "E4E82B") ?? .yellow
     var delegate: AvatarViewDelegate?
     
-    private func baseSetup(){
+    private func baseSetup() {
         cornerRadius = bounds.width / 2
     }
     
-    private func addSubviews(){
+    private func addSubviews() {
         addSubview(userInitialsLabel)
         addSubview(imageView)
     }
     
-    private func setupStyleForAppearanceWithoutImage(){
+    private func setupStyleForAppearanceWithoutImage() {
         backgroundColor = emptyThumbnailColor
         userInitialsLabel.isHidden = false
         imageView.isHidden = true
     }
     
-    private func setupStyleForAppearanceWithImage(){
+    private func setupStyleForAppearanceWithImage() {
         backgroundColor = .none
         userInitialsLabel.isHidden = true
         imageView.isHidden = false
@@ -111,7 +111,7 @@ extension AvatarView {
 
 // MARK: - UIGestureRecognizerDelegate
 extension AvatarView: UIGestureRecognizerDelegate {
-    private func addTapGestureRecognizer(){
+    private func addTapGestureRecognizer() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tap(_:)))
         tap.delegate = self
         isUserInteractionEnabled = true

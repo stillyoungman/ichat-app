@@ -30,17 +30,17 @@ class ConversationCell: UITableViewCell, INibView {
         }
     }
     
-    private func updateBackroundColor(){
+    private func updateBackroundColor() {
         isOnline = !(!isOnline)
     }
     
     private let lastMessageFontSize: CGFloat = 13
     private let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
     private lazy var lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
-    private lazy var noMessagesFont = UIFont.init(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
+    private lazy var noMessagesFont = UIFont(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
     private let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
     
-    private func initialSetup(){
+    private func initialSetup() {
         rightChevronView.addSubview(chevron)
         selectionStyle = .none
     }
@@ -59,7 +59,6 @@ class ConversationCell: UITableViewCell, INibView {
         if mode == .night {
             chevron.tintColor = theme.titnColor
         }
-        
         
         name.textColor = theme.primaryText
         time.textColor = theme.secondaryText
@@ -87,18 +86,17 @@ extension ConversationCell {
         chevron.center = CGPoint(x: rightChevronView.bounds.width / 2, y: rightChevronView.bounds.height / 2)
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool)
-    {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
-        if(animated) {
-            UIView.animate(withDuration: 0.1, delay: 1.0, options:[], animations: {
+        if animated {
+            UIView.animate(withDuration: 0.1, delay: 1.0, options: [], animations: {
                 if selected {
                     self.backgroundColor = self.selectedBackroundColor
                 } else {
                     self.updateBackroundColor()
                 }
-            }, completion:nil)
+            }, completion: nil)
         } else {
             if selected {
                 self.backgroundColor = self.selectedBackroundColor
@@ -145,7 +143,7 @@ extension ConversationCell: IConfigurable {
         style.lineSpacing = lineSpacing
         
         attributeString.addAttribute(NSAttributedString.Key.paragraphStyle,
-                                     value: style, range: NSMakeRange(0, attributeString.length))
+                                     value: style, range: NSRange(location: 0, length: attributeString.length))
         
         return attributeString
     }

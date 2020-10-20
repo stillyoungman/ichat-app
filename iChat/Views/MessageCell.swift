@@ -9,8 +9,8 @@
 import UIKit
 
 class MessageCell: UITableViewCell {
-    private var outputMessageColor = UIColor.init(hex: "#DCF7C5") ?? UIColor.systemGreen
-    private var inputMessageColor = UIColor.init(hex: "#DFDFDF") ?? UIColor.systemGray
+    private var outputMessageColor = UIColor(hex: "#DCF7C5") ?? UIColor.systemGreen
+    private var inputMessageColor = UIColor(hex: "#DFDFDF") ?? UIColor.systemGray
     
     private let bubbleMaxWidthMultiplier: CGFloat = 0.7
     
@@ -77,7 +77,7 @@ class MessageCell: UITableViewCell {
         initialSetup()
     }
     
-    private func initialSetup(){
+    private func initialSetup() {
         selectionStyle = .none
         bubble.contentView = textView
         backgroundColor = .none
@@ -106,7 +106,7 @@ class MessageCell: UITableViewCell {
 
 extension MessageCell: IConfigurable {
     
-    func configure(with model: IMessage){
+    func configure(with model: IMessage) {
         let direction: Direction = model.isOutgoing ? .out : .in
         activateConstraints(for: direction)
         bubble.activateConstraints(for: direction)

@@ -82,6 +82,7 @@ class PTViewController: UIViewController {
         trace()
     }
     
+    // swiftlint:disable:next prohibited_super_call
     override func loadView() {
         trace(.in)
         super.loadView()

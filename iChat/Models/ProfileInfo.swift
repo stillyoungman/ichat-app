@@ -16,21 +16,15 @@ class ProfileInfo: NSObject, NSCoding, IProfileInfo {
     var image: UIImage?
     
     required init?(coder: NSCoder) {
-        username = coder.decodeObject(forKey: CodingKeys.username.rawValue) as! String
-        about = coder.decodeObject(forKey: CodingKeys.description.rawValue) as! String
-        location = coder.decodeObject(forKey: CodingKeys.location.rawValue) as! String
+        guard let username = coder.decodeObject(forKey: CodingKeys.username.rawValue) as? String,
+            let about = coder.decodeObject(forKey: CodingKeys.description.rawValue) as? String,
+            let location = coder.decodeObject(forKey: CodingKeys.location.rawValue) as? String
+            else { return nil}
+        self.username = username
+        self.about = about
+        self.location = location
         image = coder.decodeObject(forKey: CodingKeys.image.rawValue) as? UIImage
     }
-    
-//    required init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        username = try container.decode(String.self, forKey: .username)
-//        userDescription = try container.decode(String.self, forKey: .description)
-//        location = try container.decode(String.self, forKey: .location)
-//        if let imageData = try? container.decode(Data?.self, forKey: .image) {
-//            image = UIImage(data: imageData)
-//        }
-//    }
     
     func encode(with coder: NSCoder) {
         coder.encode(username, forKey: CodingKeys.username.rawValue)
@@ -55,7 +49,6 @@ class ProfileInfo: NSObject, NSCoding, IProfileInfo {
         location, image
     }
 }
-
 
 //extension ProfileInfo: Codable {
 //    

@@ -12,9 +12,9 @@ class SaveOperation: Operation {
     
     let data: Data
     let path: URL
-    let completion: (Error?) -> ()
+    let completion: (Error?) -> Void
     
-    init(_ data: Data, to path: URL, completion: @escaping (Error?) -> ()) {
+    init(_ data: Data, to path: URL, completion: @escaping (Error?) -> Void) {
         self.data = data
         self.path = path
         self.completion = completion
@@ -51,24 +51,23 @@ class OPersistenceManager: IPersistenceManager {
         queue.qualityOfService = .utility
     }
     
-    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> Void) {
         queue.addOperation(SaveOperation(data, to: path, completion: completion))
     }
     
-    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> Void) {
         queue.addOperation {
             do {
                 let data = try NSKeyedArchiver.archivedData(withRootObject: item, requiringSecureCoding: false)
                 self.queue.addOperation(SaveOperation(data, to: path, completion: completion))
-            }
-            catch {
+            } catch {
                 print(error.localizedDescription)
                 completion(AppError())
             }
         }
     }
     
-    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> ()) {
+    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> Void) {
         
     }
 }

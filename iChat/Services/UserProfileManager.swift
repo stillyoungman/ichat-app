@@ -23,12 +23,12 @@ class UserProfileManager: IProfileInfoProvider {
                                             location: "Moscow, Russia",
                                             image: UIImage(named: "droid"))
     
-    func handle(completion: @escaping (Error?) -> ()){
+    func handle(completion: @escaping (Error?) -> Void) {
         
     }
     
-    func save(_ manager: IPersistenceManager? = nil, profile: ProfileInfo, completion: @escaping (Error?) -> ()) {
-        let wraper: (Error?) -> () = { [weak self] err in
+    func save(_ manager: IPersistenceManager? = nil, profile: ProfileInfo, completion: @escaping (Error?) -> Void) {
+        let wraper: (Error?) -> Void = { [weak self] err in
             if err == nil {
                 self?._profile = profile
             }
@@ -37,11 +37,11 @@ class UserProfileManager: IProfileInfoProvider {
         (manager ?? persistenceManager).persist(profile, to: profileURL, wraper)
     }
     
-    func get(_ manager: IPersistenceManager? = nil, completion: @escaping (Error?, IProfileInfo?) -> ()) {
+    func get(_ manager: IPersistenceManager? = nil, completion: @escaping (Error?, IProfileInfo?) -> Void) {
         (manager ?? persistenceManager).read(from: profileURL, completion)
     }
     
-    let dispatchGroup  = DispatchGroup()
+    let dispatchGroup = DispatchGroup()
     private init() {
         self.dispatchGroup.enter()
         get { err, prof in

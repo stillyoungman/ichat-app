@@ -8,7 +8,8 @@
 
 import Foundation
 
-typealias Conversations = Array<IConversationInfo>
+typealias Conversations = [IConversationInfo]
+// swiftlint:disable:next type_name
 private typealias CI = ConversationInfo
 
 class ConversationsInfoProvider {
@@ -16,8 +17,8 @@ class ConversationsInfoProvider {
     
     private let saPack: [(String, String)] = [
         ("Officer Frank Tenpenny", "See ya 'round, Carl. Like a 🍩 "),
-        ("Carl Johnson","You do know that I'm black, right? And not Chinese?"),
-        ("Mike Toreno", "You know, after what you've done for me, it's like you're a pro now. I got double agents in Panama who want to put a price on your head. A Russian spy - a little, fat, Boris looking guy - he's asking for clearance to interrogate you, Russian style. Calipers on the genitals. Feels good, you'd like it."),
+        ("Carl Johnson", "You do know that I'm black, right? And not Chinese?"),
+        ("Mike Toreno", "You know, after what you've done for me, it's like you're a pro now. I got double agents in Panama who want to put a price on your head."),
         ("Tommy Smith", "I've said it before... All we need is a little patience.")
     ]
     
@@ -38,26 +39,26 @@ class ConversationsInfoProvider {
     ]
     
     private lazy var dummyData = [
-        CI(name: "Gabe Newell", message: "", date: Date.init().change(.hour, -1), isOnline: true, hasUnreadMessages: false),
-        CI(name: "Homer Simpson", message: "", date: Date.init().change(.day, -21), isOnline: true, hasUnreadMessages: false),
-        CI(name: saPack[0].0, message: saPack[0].1, date: Date.init().change(.hour, 1), isOnline: true, hasUnreadMessages: true),
-        CI(name: saPack[1].0, message: saPack[1].1, date: Date.init().change(.minute, -43), isOnline: true, hasUnreadMessages: true),
-        CI(name: saPack[2].0, message: saPack[2].1, date: Date.init().change(.hour, -6), isOnline: true, hasUnreadMessages: false),
-        CI(name: saPack[3].0, message: saPack[3].1, date: Date.init().change(.minute, -246), isOnline: true, hasUnreadMessages: true),
-        CI(name: miscPack[8].0, message: miscPack[8].1, date: Date.init().change(.day, -5), isOnline: true, hasUnreadMessages: false),
-        CI(name: miscPack[6].0, message: miscPack[6].1, date: Date.init().change(.day, -15), isOnline: true, hasUnreadMessages: false),
-        CI(name: miscPack[5].0, message: miscPack[5].1, date: Date.init().change(.minute, -1), isOnline: true, hasUnreadMessages: false),
-        CI(name: miscPack[11].0, message: miscPack[11].1, date: Date.init().change(.minute, -14), isOnline: true, hasUnreadMessages: true),
-        CI(name: miscPack[0].0, message: miscPack[0].1, date: Date.init().change(.month, -2), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[1].0, message: miscPack[1].1, date: Date.init().change(.year, -50), isOnline: false, hasUnreadMessages: false),
-        CI(name: "Slim Shady", message: "", date: Date.init().change(.hour, -2), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[2].0, message: miscPack[2].1, date: Date.init().change(.minute, -1042), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[3].0, message: miscPack[3].1, date: Date.init().change(.hour, -31), isOnline: false, hasUnreadMessages: true),
-        CI(name: miscPack[4].0, message: miscPack[4].1, date: Date.init().change(.second, -30), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[7].0, message: miscPack[7].1, date: Date.init().change(.hour, -2), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[9].0, message: miscPack[9].1, date: Date.init().change(.minute, -13), isOnline: false, hasUnreadMessages: true),
-        CI(name: miscPack[10].0, message: miscPack[10].1, date: Date.init(), isOnline: false, hasUnreadMessages: false),
-        CI(name: miscPack[12].0, message: miscPack[12].1, date: Date.init(), isOnline: false, hasUnreadMessages: false)
+        CI(name: "Gabe Newell", message: "", date: Date().change(.hour, -1), isOnline: true, hasUnreadMessages: false),
+        CI(name: "Homer Simpson", message: "", date: Date().change(.day, -21), isOnline: true, hasUnreadMessages: false),
+        CI(name: saPack[0].0, message: saPack[0].1, date: Date().change(.hour, 1), isOnline: true, hasUnreadMessages: true),
+        CI(name: saPack[1].0, message: saPack[1].1, date: Date().change(.minute, -43), isOnline: true, hasUnreadMessages: true),
+        CI(name: saPack[2].0, message: saPack[2].1, date: Date().change(.hour, -6), isOnline: true, hasUnreadMessages: false),
+        CI(name: saPack[3].0, message: saPack[3].1, date: Date().change(.minute, -246), isOnline: true, hasUnreadMessages: true),
+        CI(name: miscPack[8].0, message: miscPack[8].1, date: Date().change(.day, -5), isOnline: true, hasUnreadMessages: false),
+        CI(name: miscPack[6].0, message: miscPack[6].1, date: Date().change(.day, -15), isOnline: true, hasUnreadMessages: false),
+        CI(name: miscPack[5].0, message: miscPack[5].1, date: Date().change(.minute, -1), isOnline: true, hasUnreadMessages: false),
+        CI(name: miscPack[11].0, message: miscPack[11].1, date: Date().change(.minute, -14), isOnline: true, hasUnreadMessages: true),
+        CI(name: miscPack[0].0, message: miscPack[0].1, date: Date().change(.month, -2), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[1].0, message: miscPack[1].1, date: Date().change(.year, -50), isOnline: false, hasUnreadMessages: false),
+        CI(name: "Slim Shady", message: "", date: Date().change(.hour, -2), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[2].0, message: miscPack[2].1, date: Date().change(.minute, -1042), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[3].0, message: miscPack[3].1, date: Date().change(.hour, -31), isOnline: false, hasUnreadMessages: true),
+        CI(name: miscPack[4].0, message: miscPack[4].1, date: Date().change(.second, -30), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[7].0, message: miscPack[7].1, date: Date().change(.hour, -2), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[9].0, message: miscPack[9].1, date: Date().change(.minute, -13), isOnline: false, hasUnreadMessages: true),
+        CI(name: miscPack[10].0, message: miscPack[10].1, date: Date(), isOnline: false, hasUnreadMessages: false),
+        CI(name: miscPack[12].0, message: miscPack[12].1, date: Date(), isOnline: false, hasUnreadMessages: false)
     ]
     
     private var onlineConversations: Conversations = [ConversationInfo]()
@@ -67,7 +68,7 @@ class ConversationsInfoProvider {
         onlineConversations = conversations
             .filter { $0.isOnline }
             .sorted { first, second in
-                var result: Bool? = nil
+                var result: Bool?
                 result = first.sortByMessageAvailability(second)
                 if let result = result { return result }
                 

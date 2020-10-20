@@ -15,7 +15,7 @@ class BubbleView: UIView {
             shapeLayer.fillColor = color?.cgColor
         }
     }
-    let shapeLayer: CAShapeLayer =  CAShapeLayer()
+    let shapeLayer: CAShapeLayer = CAShapeLayer()
     let contentLayoutGuide: UILayoutGuide = {
         let lg = UILayoutGuide()
         lg.identifier = "Content Layout Guide"
@@ -37,7 +37,6 @@ class BubbleView: UIView {
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
-    
     
     func setupContentLayoutGuide() {
         addLayoutGuide(contentLayoutGuide)
@@ -77,7 +76,7 @@ class BubbleView: UIView {
     }
     
     var activeConstraints: [NSLayoutConstraint]?
-    func activateConstraints(for direction: Direction){
+    func activateConstraints(for direction: Direction) {
         activeConstraints?.deactivate()
         self.direction = direction
         
@@ -92,7 +91,7 @@ class BubbleView: UIView {
         activeConstraints?.activate()
     }
     
-    @objc func tapped(_ sender: UITapGestureRecognizer){
+    @objc func tapped(_ sender: UITapGestureRecognizer) {
     }
     
     override func draw(_ rect: CGRect) {

@@ -13,7 +13,11 @@ import Photos
 // TODO: Add remove image
 class UserPageViewController: UIViewController, IStoryboardViewController, IConfigurable {
     
-    lazy var avatarView: AvatarView = AvatarView.fromNib()
+    lazy var avatarView: AvatarView = {
+        let a = AvatarView.fromNib()
+        a.isUserInteractionEnabled = false
+        return a
+    }()
     lazy var editAvatarPictureButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Edit", for: .normal)
@@ -29,7 +33,7 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     }()
     lazy var location: TextField = {
         let tf = TextField()
-        tf.font =  UIFont.systemFont(ofSize: 16, weight: .light)
+        tf.font = UIFont.systemFont(ofSize: 16, weight: .light)
         tf.textAlignment = .center
         return tf
     }()
@@ -119,13 +123,12 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     private var container: IServiceResolver!
     private var theme: IThemeProvider!
     
-    fileprivate lazy var state: State = {
-        let state = State()
+    fileprivate lazy var state: AvatarState = {
+        let state = AvatarState()
         state.isEditingChanged = isEditingChanged
         state.changeStateChanged = changingStateWasChanged
         return state
     }()
-    
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
@@ -170,8 +173,8 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
         about.textColor = theme.value.primaryText
         location.textColor = theme.value.primaryText
         
-        userName.attributedPlaceholder = NSAttributedString(string:"Your name", attributes: [NSAttributedString.Key.foregroundColor: theme.value.secondaryText])
-        location.attributedPlaceholder = NSAttributedString(string:"Location.", attributes: [NSAttributedString.Key.foregroundColor: theme.value.secondaryText])
+        userName.attributedPlaceholder = NSAttributedString(string: "Your name", attributes: [NSAttributedString.Key.foregroundColor: theme.value.secondaryText])
+        location.attributedPlaceholder = NSAttributedString(string: "Location.", attributes: [NSAttributedString.Key.foregroundColor: theme.value.secondaryText])
 
         userName.padding = UIEdgeInsets(top: 4, left: 7, bottom: 4, right: 7)
         
@@ -189,7 +192,7 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
         state.configure(with: model)
     }
     
-    //MARK: - State change handlers
+// MARK: - State change handlers
     func isEditingChanged() {
         if state.isEditing {
             userName.isEnabled = true
@@ -208,7 +211,6 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
                                               borderWith: 1,
                                               borderCornerRadius: 10)
             locationAndAboutWrapper.cornerRadius = 10
-            
             
             navigationItem.leftBarButtonItem = resetButton
         } else {
@@ -249,16 +251,16 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     // MARK: - Handlers
     var profileHasBeenChanged: ((IProfileInfo) -> Void)?
     
-    @objc func back(sender: UIBarButtonItem){
+    @objc func back(sender: UIBarButtonItem) {
         dismiss(animated: true)
     }
     
-    @objc func reset(sender: UIBarButtonItem){
+    @objc func reset(sender: UIBarButtonItem) {
         self.configure(with: state.model)
         state.reset()
     }
     
-    @objc func startEditing(sender: UIBarButtonItem){
+    @objc func startEditing(sender: UIBarButtonItem) {
         state.startEditing()
     }
     
@@ -266,17 +268,17 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
         presentAlertViewController()
     }
     
-    func enableUIControls(_ value: Bool){
+    func enableUIControls(_ value: Bool) {
         gcdSave.isEnabled = value
         operationSave.isEnabled = value
         editProfileButton.isEnabled = value
         navigationItem.leftBarButtonItem?.isEnabled = value
     }
     
-    func presentErrorAlert(_ retryAction: @escaping () -> ()) {
+    func presentErrorAlert(_ retryAction: @escaping () -> Void) {
         let alert = UIAlertController(title: nil, message: "Profile was updated", preferredStyle: .alert)
-        let ok = UIAlertAction(title: "Ok", style: .cancel) { a in alert.dismiss(animated: true) }
-        let retry = UIAlertAction(title: "Retry", style: .default) { a in retryAction() }
+        let ok = UIAlertAction(title: "Ok", style: .cancel) { _ in alert.dismiss(animated: true) }
+        let retry = UIAlertAction(title: "Retry", style: .default) { _ in retryAction() }
         alert.addAction(ok)
         alert.addAction(retry)
         present(alert, animated: true)
@@ -284,7 +286,7 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     
     func presentSuccessAlert() {
         let alert = UIAlertController(title: nil, message: "Profile was updated", preferredStyle: .alert)
-        let ok = UIAlertAction(title: "Ok", style: .default) { a in alert.dismiss(animated: true) }
+        let ok = UIAlertAction(title: "Ok", style: .default) { _ in alert.dismiss(animated: true) }
         alert.addAction(ok)
         present(alert, animated: true)
     }
@@ -321,9 +323,8 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
 
 // MARK: - Changing of avatar
 extension UserPageViewController {
-    private func presentAlertViewController(){
+    private func presentAlertViewController() {
         let vc = UIAlertController(title: nil, message: "Choose source of picture", preferredStyle: .actionSheet)
-        
         
         let takePhoto = UIAlertAction(title: "Take Photo", style: .default ) { _ in
             vc.dismiss(animated: true)
@@ -362,43 +363,6 @@ extension UserPageViewController {
 
             present(imagePicker, animated: true, completion: nil)
         }
-    }
-}
-
-// MARK: - State
-fileprivate class State {
-    private(set) var isEditing = false {
-        didSet {
-            isEditingChanged?()
-        }
-    }
-    var wasChanged = false {
-        didSet {
-            changeStateChanged?()
-        }
-    }
-    
-    var isEditingChanged: (() -> ())?
-    var changeStateChanged: (() -> ())?
-    
-    func startEditing() {
-        wasChanged = true
-        isEditing = true
-    }
-    
-    func stopEditing() {
-        isEditing = false
-    }
-    
-    func reset(){
-        stopEditing()
-        wasChanged = false
-    }
-    
-    private(set) var model: IProfileInfo!
-    
-    func configure(with model: IProfileInfo) {
-        self.model = model
     }
 }
 
@@ -464,81 +428,9 @@ extension UserPageViewController {
     }
 }
 
-extension UserPageViewController {
-    //потому что для Apple так сложно подвезти UILayoutGuid в IB :((
-    func setupConstraints(){
-        currentLayoutConstraints = defaultLayoutConstraints
-        currentLayoutConstraints.activate()
-        
-        view.addSubview(avatarView)
-        view.addSubview(editAvatarPictureButton)
-        view.addSubview(userName)
-        view.addSubview(buttonsStackView)
-        view.addSubview(locationAndAboutWrapper)
-        
-        locationAndAboutWrapper.addSubview(location)
-        locationAndAboutWrapper.addSubview(about)
-        
-        avatarView.translatesAutoresizingMaskIntoConstraints = false
-        [
-            avatarView.aspectRatio(1),
-            avatarView.heightAnchor.constraint(equalTo: wrapper.widthAnchor, multiplier: 0.6),
-            avatarView.topAnchor.constraint(equalTo: wrapper.topAnchor, constant: 25),
-            avatarView.centerXAnchor.constraint(equalTo: wrapper.centerXAnchor, constant: 0)
-        ].activate()
-        
-        editAvatarPictureButton.translatesAutoresizingMaskIntoConstraints = false
-        [
-            editAvatarPictureButton.trailingAnchor.constraint(equalTo: avatarView.trailingAnchor),
-            editAvatarPictureButton.firstBaselineAnchor.constraint(equalTo: avatarView.bottomAnchor)
-        ].activate()
-        
-        userName.translatesAutoresizingMaskIntoConstraints = false
-        [
-            userName.centerYAnchor.constraint(equalTo: avatarView.bottomAnchor, constant: 45),
-            userName.centerXAnchor.constraint(equalTo: wrapper.centerXAnchor),
-            userName.leadingAnchor.constraint(greaterThanOrEqualTo: wrapper.leadingAnchor, constant: 25),
-            userName.trailingAnchor.constraint(greaterThanOrEqualTo: wrapper.trailingAnchor, constant: 25),
-        ].activate()
-        
-        locationAndAboutWrapper.translatesAutoresizingMaskIntoConstraints = false
-        [
-            locationAndAboutWrapper.centerXAnchor.constraint(equalTo: wrapper.centerXAnchor),
-            locationAndAboutWrapper.leadingAnchor.constraint(greaterThanOrEqualTo: wrapper.leadingAnchor, constant: 25),
-            locationAndAboutWrapper.trailingAnchor.constraint(greaterThanOrEqualTo: wrapper.trailingAnchor, constant: 25),
-            locationAndAboutWrapper.topAnchor.constraint(equalTo: userName.bottomAnchor, constant: 27),
-            locationAndAboutWrapper.bottomAnchor.constraint(equalTo: buttonsStackView.topAnchor, constant: -40)
-        ].activate()
-        
-        location.translatesAutoresizingMaskIntoConstraints = false
-        [
-            location.leadingAnchor.constraint(equalTo: locationAndAboutWrapper.leadingAnchor),
-            location.trailingAnchor.constraint(equalTo: locationAndAboutWrapper.trailingAnchor),
-            location.topAnchor.constraint(equalTo: locationAndAboutWrapper.topAnchor, constant: 5)
-        ].activate()
-        
-        about.translatesAutoresizingMaskIntoConstraints = false
-        [
-            about.topAnchor.constraint(equalTo: location.bottomAnchor),
-            about.leadingAnchor.constraint(equalTo: locationAndAboutWrapper.leadingAnchor),
-            about.trailingAnchor.constraint(equalTo: locationAndAboutWrapper.trailingAnchor),
-            about.bottomAnchor.constraint(equalTo: locationAndAboutWrapper.bottomAnchor)
-        ].activate()
-        
-        
-        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
-        [
-            buttonsStackView.centerXAnchor.constraint(equalTo: wrapper.centerXAnchor),
-            buttonsStackView.heightAnchor.constraint(equalToConstant: 40),
-            buttonsStackView.bottomAnchor.constraint(equalTo: wrapper.bottomAnchor, constant: -30)
-        ].activate()
-    }
-}
-
 extension UserPageViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-        {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             avatarView.image = image
             state.wasChanged = true
         }

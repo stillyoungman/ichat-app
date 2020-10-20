@@ -7,7 +7,7 @@
 //
 
 extension String {
-    func log(){
+    func log() {
         #if ENABLE_CONSOLE_LOGGING
         print(self)
         #endif

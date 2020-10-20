@@ -21,7 +21,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return aView
     }()
     
-    private let rowHeight = CGFloat(89);
+    private let rowHeight = CGFloat(89)
     private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
     private let numberOfSections = 2
@@ -47,7 +47,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         self.themeProvider = container.resolve(for: IThemeProvider.self)
     }
     
-    private func configureNavigation(){
+    private func configureNavigation() {
         navigationItem.title = "Tinkoff Chat"
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationItem.searchController = UISearchController()
@@ -58,9 +58,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationController?.setupAppearance(with: themeProvider)
     }
     
-    
-    
-    private func setupRightBarButtonItem(){
+    private func setupRightBarButtonItem() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatarView)
     }
     
@@ -172,7 +170,7 @@ extension ConversationsListViewController {
 }
 
 // MARK: - UITableViewDataSource
-extension ConversationsListViewController: UITableViewDataSource  {
+extension ConversationsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         dataProvider.conversations(for: ConversationType.parse(section)).count
     }

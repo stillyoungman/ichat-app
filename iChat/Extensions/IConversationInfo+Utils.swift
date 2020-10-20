@@ -14,9 +14,13 @@ extension IConversationInfo {
     }
     
     func sortByUnreadMessage(_ second: IConversationInfo) -> Bool? {
-        if self.hasUnreadMessages && second.hasUnreadMessages { return nil }
-        else if self.hasUnreadMessages { return true }
-        else { return false }
+        if self.hasUnreadMessages && second.hasUnreadMessages {
+            return nil
+        } else if self.hasUnreadMessages {
+            return true
+        } else {
+            return false
+        }
     }
     
     func sortByMessageAvailability(_ second: IConversationInfo) -> Bool? {

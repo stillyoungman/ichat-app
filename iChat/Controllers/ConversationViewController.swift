@@ -31,13 +31,13 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
         setupAppearance()
     }
     
-    private func configureNavigation(){
+    private func configureNavigation() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.isTranslucent = true
     }
     
-    private func configureTableView(){
+    private func configureTableView() {
         tableView.register(MessageCell.self, forCellReuseIdentifier: MessageCell.typeName)
         tableView.dataSource = self
         tableView.separatorStyle = .none
@@ -74,5 +74,3 @@ extension ConversationViewController: UITableViewDataSource {
         return cell
     }
 }
-
-

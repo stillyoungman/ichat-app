@@ -44,13 +44,13 @@ extension UIColor {
     
     static func random() -> UIColor {
         return UIColor(
-           red:   .random(),
+           red: .random(),
            green: .random(),
-           blue:  .random(),
+           blue: .random(),
            alpha: 1.0
         )
     }
     
     static var softYellow: UIColor { UIColor.yellow.withAlphaComponent(0.1) }
-    static var milkGray: UIColor { (UIColor.init(hex: "3C3C43") ?? UIColor.lightGray).withAlphaComponent(0.6) }
+    static var milkGray: UIColor { (UIColor(hex: "3C3C43") ?? UIColor.lightGray).withAlphaComponent(0.6) }
 }

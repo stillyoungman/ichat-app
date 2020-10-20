@@ -19,4 +19,3 @@ class DummyConversationsProvider: IConversationsProvider {
     
     private init() { }
 }
-

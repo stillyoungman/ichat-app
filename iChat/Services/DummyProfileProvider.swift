@@ -15,4 +15,3 @@ class DummyProfileProvider: IProfileInfoProvider {
                               location: "Moscow, Russia",
                               image: UIImage(named: "droid"))
 }
-

@@ -8,24 +8,22 @@
 
 import Foundation
 
-
-
 class GPersistenceManager: IPersistenceManager {
     let base = BasePersistenceManager()
-    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> ()) {
+    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> Void) {
         DQ.global(qos: .utility).async {
             self.base.read(from: path, completion)
         }
         
     }
     
-    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> Void) {
         DQ.global(qos: .utility).async {
             self.base.persist(data: data, to: path, completion)
         }
     }
     
-    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> Void) {
         DQ.global(qos: .utility).async {
             self.base.persist(item, to: path, completion)
         }

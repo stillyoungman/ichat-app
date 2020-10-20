@@ -14,7 +14,7 @@ class ThemesViewController: UIViewController, IStoryboardViewController {
     @IBOutlet private var labels: [UILabel]!
     
     @IBAction private func handleThemeChange(_ sender: UIButton) {
-        guard let mode = ThemeMode.init(rawValue: sender.tag) else {
+        guard let mode = ThemeMode(rawValue: sender.tag) else {
             fatalError("Unsopported ThemeMode")
         }
         
@@ -34,8 +34,7 @@ class ThemesViewController: UIViewController, IStoryboardViewController {
         setupAppearance()
     }
     
-    
-    var delegate: ThemesPickerDelegate?
+    weak var delegate: ThemesPickerDelegate?
     var themeChanged: ((ThemeMode) -> Void)?
     
     private var theme: ThemesViewControllerTheme!
@@ -57,14 +56,14 @@ class ThemesViewController: UIViewController, IStoryboardViewController {
         setupAppearance()
     }
     
-    private func configureNavigation(){
+    private func configureNavigation() {
         title = "Settings"
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.isTranslucent = true
     }
     
-    private func setupAppearance(){
+    private func setupAppearance() {
         if let labels = self.labels {
             for label in labels {
                 label.textColor = theme.font
@@ -110,15 +109,15 @@ extension ThemesViewController: ISupportTheme {
     
     private var classicTheme: ThemesViewControllerTheme {
         ThemesViewControllerTheme(font: .white,
-                                  backbournd: UIColor.init(hex: "#193661")!,
-                                  selectionStroke: UIColor.init(hex: "#007AFF")!,
+                                  backbournd: UIColor(hex: "#193661")!,
+                                  selectionStroke: UIColor(hex: "#007AFF")!,
                                   notSelectedStroke: nil)
     }
     
     private var dayTheme: ThemesViewControllerTheme {
         ThemesViewControllerTheme(font: .black,
                                   backbournd: .white,
-                                  selectionStroke: UIColor.init(hex: "#007AFF")!,
+                                  selectionStroke: UIColor(hex: "#007AFF")!,
                                   notSelectedStroke: .gray)
     }
     
@@ -138,7 +137,7 @@ extension ThemesViewController: ISupportTheme {
     }
 }
 
-protocol ThemesPickerDelegate {
+protocol ThemesPickerDelegate: class {
     func themeChanged(_ mode: ThemeMode)
 }
 

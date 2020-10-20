@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class AppNavigationViewController: UINavigationController {
-    static func create(withRoot viewController: UIViewController) -> AppNavigationViewController{
+    static func create(withRoot viewController: UIViewController) -> AppNavigationViewController {
         let nc = AppNavigationViewController(navigationBarClass: AppNavigationBar.self, toolbarClass: nil)
         nc.setViewControllers([viewController], animated: false)
         return nc
@@ -36,8 +36,7 @@ extension UINavigationController {
         
         if mode == .night {
             navigationBar.barStyle = .blackTranslucent
-        }
-        else {
+        } else {
             navigationBar.barStyle = .default
         }
     }

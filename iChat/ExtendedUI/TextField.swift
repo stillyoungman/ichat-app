@@ -15,7 +15,7 @@ class TextField: UITextField {
     
     override open func textRect(forBounds bounds: CGRect) -> CGRect {
         let paddedRect = bounds.inset(by: self.padding)
-        if (self.leftViewMode == .always || self.leftViewMode == .unlessEditing) {
+        if self.leftViewMode == .always || self.leftViewMode == .unlessEditing {
             return self.adjustRectOriginForLeftView(bounds: paddedRect)
         }
         return paddedRect
@@ -23,22 +23,22 @@ class TextField: UITextField {
     
     override open func placeholderRect(forBounds bounds: CGRect) -> CGRect {
         let paddedRect = bounds.inset(by: self.padding)
-        if (self.leftViewMode == .always || self.leftViewMode == .unlessEditing) {
+        if self.leftViewMode == .always || self.leftViewMode == .unlessEditing {
             return self.adjustRectOriginForLeftView(bounds: paddedRect)
         }
-        return paddedRect;
+        return paddedRect
     }
     
     override open func editingRect(forBounds bounds: CGRect) -> CGRect {
-        let paddedRect = bounds.inset(by: self.padding);
-        if (self.leftViewMode == .always || self.leftViewMode == .unlessEditing) {
+        let paddedRect = bounds.inset(by: self.padding)
+        if self.leftViewMode == .always || self.leftViewMode == .unlessEditing {
             return self.adjustRectOriginForLeftView(bounds: paddedRect)
         }
-        return paddedRect;
+        return paddedRect
     }
     
-    func adjustRectOriginForLeftView(bounds : CGRect) -> CGRect{
-        var paddedRect = bounds;
+    func adjustRectOriginForLeftView(bounds: CGRect) -> CGRect {
+        var paddedRect = bounds
         paddedRect.origin.x += self.leftView!.frame.width
         return paddedRect
     }

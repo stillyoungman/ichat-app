@@ -10,8 +10,8 @@ import Foundation
 
 protocol IConversation {
     var uid: String { get }
-    var messages: Dictionary<Date, Array<IMessage>> { get }
-    var dates: Array<Date> { get }
+    var messages: [Date: [IMessage]] { get }
+    var dates: [Date] { get }
     func getDate(for indexPath: IndexPath) -> Date
     func getMessage(for indexPath: IndexPath) -> IMessage
 }
