@@ -9,13 +9,48 @@
 import Foundation
 import UIKit
 
-class ConversationViewController: UIViewController, IStoryboardViewController, IConfigurable {
-    @IBOutlet weak var tableView: UITableView!
+class ConversationViewController: GuidedViewController, IStoryboardViewController, IConfigurable {
+    lazy var tableView: UITableView = {
+        let tv = UITableView()
+        return tv
+    }()
+    
+    lazy var messageInputContainerView: UIView = {
+        let v = UIView()
+        v.backgroundColor = .clear
+        return v
+    }()
+    
+    lazy var sendButton: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.setImage(UIImage(named: "send")!.withRenderingMode(.alwaysTemplate), for: .normal)
+        btn.addTarget(self, action: #selector(sendMessage(_:)), for: .touchUpInside)
+        return btn
+    }()
+    
+    @objc func sendMessage(_ sender: UIButton) {
+        guard let text = inputTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
+        if text.isEmpty { inputTextField.text = nil; return }
+        
+        model.conversation.send(text, from: profileProvider.profile.username)
+        inputTextField.text = nil
+    }
+    
+    lazy var inputTextField: UITextField = {
+        let i = TextField()
+        i.padding = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 30)
+        i.clearButtonMode = .always
+        i.placeholder = "Enter your message..."
+        return i
+    }()
+    
     var model: IConversationViewModel!
     var themeManager: IThemeProvider!
+    var profileProvider: IProfileInfoProvider!
     
     func setupDependencies(with container: IServiceResolver) {
         themeManager = container.resolve(for: IThemeProvider.self)
+        profileProvider = container.resolve(for: IProfileInfoProvider.self)
     }
     
     func configure(with model: IConversationViewModel) {
@@ -29,10 +64,12 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
         configureTableView()
         configureNavigation()
         setupAppearance()
+        setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        sendButton.setTitleColor(themeManager.value.navTintColor, for: .normal)
         model.conversation.subscribe { [weak self] in
             guard let sSelf = self else { return }
             sSelf.tableView.reloadData()

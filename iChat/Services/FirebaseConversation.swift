@@ -11,9 +11,10 @@ import Firebase
 
 class FirebaseConversation: IConversation {
     let channelUid: String
-    static let deviceUid: String = UIDevice.current.identifierForVendor!.uuidString
+    static let deviceUid: String = UIDevice.vendorUid
     
     lazy var db = Firestore.firestore()
+    lazy var channel = db.collection("channels").document(channelUid)
     lazy var messagesCollection = db.collection("channels").document(channelUid).collection("messages")
     var messagesChangedListener: ListenerRegistration?
     
@@ -32,7 +33,9 @@ class FirebaseConversation: IConversation {
                 print(err.localizedDescription)
             } else {
                 guard let sSelf = self, let snapshot = querySnapshot else { return }
-                sSelf.messages = snapshot.documents.compactMap({ Message(with: $0, deviceUid: FirebaseConversation.deviceUid) })
+                sSelf.messages = snapshot.documents
+                    .compactMap { Message(with: $0, deviceUid: FirebaseConversation.deviceUid) } 
+                    .sorted { $0.date > $1.date }
                 messagesChangedHandler()
             }
         }
@@ -42,7 +45,18 @@ class FirebaseConversation: IConversation {
         messagesChangedListener?.remove()
     }
     
-    func send() {
+    func send(_ content: String, from user: String) {
+        let message: [String: Any] = [
+            "content": content,
+            "senderName": user,
+            "senderId": UIDevice.vendorUid,
+            "created": Firebase.Timestamp()
+        ]
         
+        messagesCollection.addDocument(data: message) { [weak self] err in
+            if err == nil {
+                self?.channel.setData(["lastMessage": content], merge: true)
+            }
+        }
     }
 }

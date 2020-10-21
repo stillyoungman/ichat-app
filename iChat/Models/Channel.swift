@@ -56,4 +56,11 @@ extension Channel {
         // if self has `lastActivity` -> has highter priority
         return self.lastActivity != nil
     }
+    
+    var data: [String: Any] {
+        return [
+            "name": self.name,
+            "ownerId": self.ownerId as Any
+        ]
+    }
 }

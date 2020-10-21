@@ -9,7 +9,6 @@
 import UIKit
 
 extension UserPageViewController {
-    //потому что для Apple так сложно подвезти UILayoutGuid в IB :((
     func setupConstraints() {
         currentLayoutConstraints = defaultLayoutConstraints
         currentLayoutConstraints.activate()

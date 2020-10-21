@@ -12,7 +12,7 @@ protocol IConversation {
     var channelUid: String { get }
     var messages: [IMessage] { get }
     
-    func send()
+    func send(_ content: String, from user: String)
     
     func subscribe(_ messagesChangedHandler: @escaping () -> Void)
     func unsubscribe()

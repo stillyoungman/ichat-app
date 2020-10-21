@@ -27,7 +27,6 @@ class ChannelsProvider {
             }
         }
     }
-
 }
 
 extension ChannelsProvider: IChannelsProvider {
@@ -57,5 +56,9 @@ extension ChannelsProvider: IChannelsProvider {
     
     func unsubsribe() {
         channelsChangedListener?.remove()
+    }
+    
+    func create(_ channel: Channel) {
+        channelsCollection.addDocument(data: channel.data)
     }
 }

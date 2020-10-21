@@ -11,6 +11,8 @@ import Foundation
 protocol IChannelsProvider {
     var items: [Channel] { get }
     
+    func create(_ channel: Channel)
+    
     func subscribe(_ channelsChangedHandler: @escaping () -> Void)
     func unsubsribe()
 }

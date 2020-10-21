@@ -11,7 +11,7 @@ import Photos
 
 // TODO: Handle avatar save
 // TODO: Add remove image
-class UserPageViewController: UIViewController, IStoryboardViewController, IConfigurable {
+class UserPageViewController: GuidedViewController, IStoryboardViewController, IConfigurable {
     
     lazy var avatarView: AvatarView = {
         let a = AvatarView.fromNib()
@@ -72,11 +72,11 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
         return stackView
     }()
     
-    lazy var wrapper: UILayoutGuide = {
-        let guide = UILayoutGuide()
-        view.addLayoutGuide(guide)
-        return guide
-    }()
+//    lazy var wrapper: UILayoutGuide = {
+//        let guide = UILayoutGuide()
+//        view.addLayoutGuide(guide)
+//        return guide
+//    }()
     
     var profile: ProfileInfo {
         ProfileInfo(username: userName.text ?? "",
@@ -85,25 +85,25 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
                     image: avatarView.image)
     }
     
-    var currentLayoutConstraints: [NSLayoutConstraint] = []
-    
-    lazy var defaultLayoutConstraints: [NSLayoutConstraint] = {
-       [
-            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-    }()
-    
-    func shiftedToTopConstraints(by value: CGFloat) -> [NSLayoutConstraint] {
-        [
-            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -value),
-            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -value)
-        ]
-    }
+//    var currentLayoutConstraints: [NSLayoutConstraint] = []
+//    
+//    lazy var defaultLayoutConstraints: [NSLayoutConstraint] = {
+//       [
+//            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+//        ]
+//    }()
+//    
+//    func shiftedToTopConstraints(by value: CGFloat) -> [NSLayoutConstraint] {
+//        [
+//            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+//            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+//            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -value),
+//            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -value)
+//        ]
+//    }
     
     lazy var backButton = UIBarButtonItem(title: "Back",
                                      style: UIBarButtonItem.Style.plain,
@@ -145,8 +145,6 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
         initialSetup()
         configure(with: model)
         setupConstraints()
-        
-        subsribeForKeyboardNotifications()
         
         navigationItem.rightBarButtonItem = editProfileButton
     }
@@ -319,6 +317,17 @@ class UserPageViewController: UIViewController, IStoryboardViewController, IConf
     @objc func saveWithOperation(_ sender: UIButton) {
         performSave(with: OPersistenceManager())
     }
+    
+    override var shiftMultiplier: CGFloat {
+        if userName.isFirstResponder {
+            return 0.4
+        } else if location.isFirstResponder {
+            return 0.75
+        } else if about.isFirstResponder {
+            return 0.9
+        }
+        return 1
+    }
 }
 
 // MARK: - Changing of avatar
@@ -363,68 +372,6 @@ extension UserPageViewController {
 
             present(imagePicker, animated: true, completion: nil)
         }
-    }
-}
-
-// MARK: - Keyboard show/dismiss handlers
-extension UserPageViewController {
-    @objc func keyboardWillShow(notification: NSNotification) {
-        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue,
-            let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            currentLayoutConstraints.deactivate()
-            currentLayoutConstraints = shiftedToTopConstraints(by: keyboardSize.height * shiftMultiplier)
-            currentLayoutConstraints.activate()
-            self.view.needsUpdateConstraints()
-            UIView.animate(withDuration: duration + 0.5) {
-                self.view.layoutIfNeeded()
-            }
-        }
-    }
-
-    @objc func keyboardWillHide(notification: NSNotification) {
-        currentLayoutConstraints.deactivate()
-        currentLayoutConstraints = defaultLayoutConstraints
-        currentLayoutConstraints.activate()
-        self.view.needsUpdateConstraints()
-        if let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            UIView.animate(withDuration: duration) {
-                self.view.layoutIfNeeded()
-            }
-        }
-    }
-    
-    var shiftMultiplier: CGFloat {
-        if userName.isFirstResponder {
-            return 0.4
-        } else if location.isFirstResponder {
-            return 0.75
-        } else if about.isFirstResponder {
-            return 0.9
-        }
-        return 1
-    }
-    
-    func subsribeForKeyboardNotifications() {
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(notification:)),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(notification:)),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object: nil)
-    }
-    
-    func unsubsribe() {
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    func hideKeyboardWhenTappedAround() {
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard(_:)))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-    }
-    
-    @objc func dismissKeyboard(_ sender: UITapGestureRecognizer) {
-        view.endEditing(true)
     }
 }
 

@@ -47,6 +47,9 @@
 		AD794B682540A1F6005F61DE /* CoversationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B672540A1F6005F61DE /* CoversationProvider.swift */; };
 		AD794B6E2540B2E3005F61DE /* FirebaseConversation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B6D2540B2E3005F61DE /* FirebaseConversation.swift */; };
 		AD794B702540CDF2005F61DE /* IChannelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B6F2540CDF2005F61DE /* IChannelsProvider.swift */; };
+		AD794B722540DEBF005F61DE /* ConversationViewController+SetupConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B712540DEBF005F61DE /* ConversationViewController+SetupConstraints.swift */; };
+		AD794B742540DF93005F61DE /* GuidedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B732540DF93005F61DE /* GuidedViewController.swift */; };
+		AD794B762540E38F005F61DE /* UIDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD794B752540E38F005F61DE /* UIDevice.swift */; };
 		AD830B36253724C500C70641 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD830B35253724C500C70641 /* TextField.swift */; };
 		ADA1D212252300810037D6AC /* ConversationsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA1D211252300810037D6AC /* ConversationsListViewController.swift */; };
 		ADA1D214252300E60037D6AC /* ConversationsList.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADA1D213252300E60037D6AC /* ConversationsList.storyboard */; };
@@ -161,6 +164,9 @@
 		AD794B672540A1F6005F61DE /* CoversationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoversationProvider.swift; sourceTree = "<group>"; };
 		AD794B6D2540B2E3005F61DE /* FirebaseConversation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseConversation.swift; sourceTree = "<group>"; };
 		AD794B6F2540CDF2005F61DE /* IChannelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IChannelsProvider.swift; sourceTree = "<group>"; };
+		AD794B712540DEBF005F61DE /* ConversationViewController+SetupConstraints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConversationViewController+SetupConstraints.swift"; sourceTree = "<group>"; };
+		AD794B732540DF93005F61DE /* GuidedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedViewController.swift; sourceTree = "<group>"; };
+		AD794B752540E38F005F61DE /* UIDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIDevice.swift; sourceTree = "<group>"; };
 		AD830B35253724C500C70641 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		ADA1D211252300810037D6AC /* ConversationsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsListViewController.swift; sourceTree = "<group>"; };
 		ADA1D213252300E60037D6AC /* ConversationsList.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ConversationsList.storyboard; sourceTree = "<group>"; };
@@ -290,12 +296,14 @@
 		AD6630DA251B68AA008D6718 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				AD794B732540DF93005F61DE /* GuidedViewController.swift */,
 				ADE850A02524B3330017C3C9 /* AppNavigationViewController.swift */,
 				ADA1D211252300810037D6AC /* ConversationsListViewController.swift */,
 				ADE850AA2524C2910017C3C9 /* ConversationViewController.swift */,
 				ADCC8E79252E310E00D8744D /* ThemesViewController.swift */,
 				AD6630DB251B6ADB008D6718 /* UserPageViewController.swift */,
 				ADAE8D7D253F5CEC00D4A3C7 /* UserPageViewController+SetupConstraints.swift */,
+				AD794B712540DEBF005F61DE /* ConversationViewController+SetupConstraints.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -347,6 +355,7 @@
 				AD47F2F6251B862D00F9DDF5 /* UIImageView.swift */,
 				AD47F2F8251BA35600F9DDF5 /* UILabel.swift */,
 				AD6630D8251B6497008D6718 /* UIView.swift */,
+				AD794B752540E38F005F61DE /* UIDevice.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -791,9 +800,12 @@
 				AD38A781252E187700A81ED5 /* ProfileInfo.swift in Sources */,
 				AD47F302251BBD7900F9DDF5 /* UIColor.swift in Sources */,
 				ADEE9B7C250CAB17009E6518 /* Direction.swift in Sources */,
+				AD794B762540E38F005F61DE /* UIDevice.swift in Sources */,
+				AD794B722540DEBF005F61DE /* ConversationViewController+SetupConstraints.swift in Sources */,
 				AD47F305251BC78800F9DDF5 /* CGRect.swift in Sources */,
 				AD6630DC251B6ADB008D6718 /* UserPageViewController.swift in Sources */,
 				ADCC8E7A252E310E00D8744D /* ThemesViewController.swift in Sources */,
+				AD794B742540DF93005F61DE /* GuidedViewController.swift in Sources */,
 				ADEE9B75250C9152009E6518 /* Logging.swift in Sources */,
 				ADE85099252436780017C3C9 /* Bootstrapper.swift in Sources */,
 				ADAB6298252E474A0059616E /* ThemeMode.swift in Sources */,
