@@ -9,7 +9,7 @@
 import UIKit
 
 class ConversationCell: UITableViewCell, INibView {
-    private(set) var model: IConversationInfo?
+    private(set) var model: Channel?
     
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var rightChevronView: UIView!
@@ -81,14 +81,14 @@ extension ConversationCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         chevron.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
         chevron.center = CGPoint(x: rightChevronView.bounds.width / 2, y: rightChevronView.bounds.height / 2)
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         if animated {
             UIView.animate(withDuration: 0.1, delay: 1.0, options: [], animations: {
                 if selected {
@@ -109,30 +109,33 @@ extension ConversationCell {
 
 // MARK: - IConfigurable
 extension ConversationCell: IConfigurable {
-    typealias ConfigurationModel = IConversationInfo
+    typealias ConfigurationModel = Channel
     
-    func configure(with model: IConversationInfo) {
+    func configure(with model: Channel) {
         self.model = model
         self.name.text = model.name
-        self.isOnline = model.isOnline
+        self.isOnline = false
         
         if model.hasNoMessages {
             self.lastMessage.text = "No messages yet"
             self.lastMessage.font = noMessagesFont
             self.lastMessage.textColor = .black
         } else {
-            self.lastMessage.attributedText = configureLastMessageText(model.message)
-            time.text = model.date.isYesterdayOrEarlier
-                ? model.date.toDaysAndMonthsString()
-                : model.date.toHoursAndMinutesString()
-            if model.hasUnreadMessages { self.lastMessage.font = lastMessageDefaultFont.bold }
+            if let lastMessage = model.lastMessage {
+                self.lastMessage.attributedText = configureLastMessageText(lastMessage)
+            }
+            if let lastActivity = model.lastActivity {
+                time.text = lastActivity.isYesterdayOrEarlier
+                    ? lastActivity.toDaysAndMonthsString()
+                    : lastActivity.toHoursAndMinutesString()
+            }
         }
         
         avatarView.configure(with: AvatarViewModel(username: model.name, image: nil))
         
     }
     
-    func setModel(_ model: IConversationInfo) {
+    func setModel(_ model: Channel) {
         self.model = model
     }
     

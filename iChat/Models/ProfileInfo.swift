@@ -19,7 +19,7 @@ class ProfileInfo: NSObject, NSCoding, IProfileInfo {
         guard let username = coder.decodeObject(forKey: CodingKeys.username.rawValue) as? String,
             let about = coder.decodeObject(forKey: CodingKeys.description.rawValue) as? String,
             let location = coder.decodeObject(forKey: CodingKeys.location.rawValue) as? String
-            else { return nil}
+            else { return nil }
         self.username = username
         self.about = about
         self.location = location
@@ -49,17 +49,3 @@ class ProfileInfo: NSObject, NSCoding, IProfileInfo {
         location, image
     }
 }
-
-//extension ProfileInfo: Codable {
-//    
-//
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(description, forKey: .description)
-//        try container.encode(username, forKey: .username)
-//        try container.encode(location, forKey: .location)
-//        try container.encode(image?.pngData() ?? image?.jpegData(compressionQuality: 1), forKey: .image)
-//    }
-//
-//    
-//}

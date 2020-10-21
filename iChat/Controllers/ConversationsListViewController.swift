@@ -49,7 +49,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     private let rowHeight = CGFloat(89)
     private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
-    private let numberOfSections = 2
     private let cellIdentifier = ConversationCell.typeName
     private let headerIdentifier = HeaderView.typeName
     
@@ -63,12 +62,12 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     }
     
     private var container: IServiceResolver!
-    private var dataProvider: IConversationsInfoProvider!
     private var themeProvider: IThemeProvider!
+    private var channelsProvider: IChannelsProvider!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
-        self.dataProvider = container.resolve(for: IConversationsInfoProvider.self)
+        self.channelsProvider = container.resolve(for: IChannelsProvider.self)
         self.themeProvider = container.resolve(for: IThemeProvider.self)
     }
     
@@ -103,12 +102,12 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.leftBarButtonItem = settings
     }
     
-    private func presentConversation(for conversationInfo: IConversationInfo) {
+    private func presentConversation(for channelInfo: Channel) {
         navigationItem.title = nil
         let destination = ConversationViewController.instantiate(container: container)
         let conversationsProvider: IConversationsProvider = container.resolve()
-        let conversation = conversationsProvider.conversation(for: conversationInfo.uid)
-        let viewModel = ConversationViewModel(title: conversationInfo.name, conversation: conversation)
+        let conversation = conversationsProvider.conversation(for: channelInfo.identifier)
+        let viewModel = ConversationViewModel(title: channelInfo.name, conversation: conversation)
         destination.configure(with: viewModel)
         self.show(destination, sender: nil)
     }
@@ -183,7 +182,16 @@ extension ConversationsListViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigation()
-        
+        channelsProvider.subscribe { [weak self] in
+            DQ.main.async {
+                self?.tableView.reloadData()
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        channelsProvider.unsubsribe()
     }
     
     ///Updates leading inset of tableViewHeader when screen orientation was changed
@@ -202,14 +210,13 @@ extension ConversationsListViewController {
 // MARK: - UITableViewDataSource
 extension ConversationsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dataProvider.conversations(for: ConversationType.parse(section)).count
+        channelsProvider.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? ConversationCell
             else { fatalError("Cast to ConversationCell failed.") }
-        cell.configure(with:
-            dataProvider.conversations(for: ConversationType.parse(indexPath.section))[AnyIndex(indexPath.row)])
+        cell.configure(with: channelsProvider.items[indexPath.row])
         cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }
@@ -219,51 +226,14 @@ extension ConversationsListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ConversationsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { rowHeight }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        numberOfSections
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerIdentifier)
-            as? HeaderView else {
-                fatalError("Cast to HeaderView failed.")
-        }
-        header.configure(with: HeaderModel(title: ConversationType.parse(section).toString(),
-                                           mode: themeProvider.mode,
-                                           theme: themeProvider.value))
-        header.leadingInset = headerLeadingInset
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        headerHeight
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        headerHeight
-    }
-    
+        
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
         cell.setSelected(false, animated: true)
         
-        guard let conversationInfo = cell.model
+        guard let channelInfo = cell.model
             else { assert(false, "Unable to unwrap ConversationInfo."); return }
         
-        presentConversation(for: conversationInfo)
-    }
-}
-
-import Combine
-class BlockObject: NSObject {
-    let block: () -> Void
-
-    init(block: @escaping () -> Void) {
-        self.block = block
-    }
-
-    @objc dynamic func execute() {
-        block()
+        presentConversation(for: channelInfo)
     }
 }

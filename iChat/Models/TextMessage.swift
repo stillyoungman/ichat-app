@@ -15,6 +15,8 @@ struct TextMessage: ITextMessage {
     var deliveryStatus: DeliveryStatus
     let senderUid: String
     let isOutgoing: Bool
+    let senderName: String = ""
+    let deviceUid: String = ""
     
     let date: Date
 }

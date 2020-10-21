@@ -18,20 +18,17 @@ class Bootstrapper {
         return container
     }()
     
-    static func setupRootViewController(_ window: UIWindow) {
-        //touch to begin uploading
-        _ = UserProfileManager.shared
-        
-        window.rootViewController = AppNavigationViewController
-            .create(withRoot: ConversationsListViewController.instantiate(container: container))
-        window.makeKeyAndVisible()
-    }
-    
     private static func configure(_ container: IContainer) {
         container.register(ConversationsInfoProvider.instance as IConversationsInfoProvider)
-        container.register(DummyConversationsProvider.instance as IConversationsProvider)
+        container.register(for: .singleton) { _ in ConversationProvider() as IConversationsProvider }
         container.register(UserProfileManager.shared as IProfileInfoProvider)
         container.register(ThemeManager.shared as IThemeManager)
         container.register(ThemeManager.shared as IThemeProvider)
+        container.register(ChannelsProvider.shared as IChannelsProvider)
+    }
+    
+    static func initApplication(_ window: UIWindow) {
+        window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.instantiate(container: container))
+        window.makeKeyAndVisible()
     }
 }

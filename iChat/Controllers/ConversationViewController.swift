@@ -31,6 +31,19 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
         setupAppearance()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        model.conversation.subscribe { [weak self] in
+            guard let sSelf = self else { return }
+            sSelf.tableView.reloadData()
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        model.conversation.unsubscribe()
+    }
+    
     private func configureNavigation() {
         navigationController?.navigationBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
@@ -57,10 +70,7 @@ class ConversationViewController: UIViewController, IStoryboardViewController, I
 // MARK: - UITableViewDataSource
 extension ConversationViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        model.conversation.messages.values.reduce(0, { $0 + $1.count })}
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        model.conversation.messages.values.count
+        model.conversation.messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -68,7 +78,7 @@ extension ConversationViewController: UITableViewDataSource {
             else { fatalError("Unable cast the cell to \(MessageCell.typeName)") }
         
         cell.apply(themeManager.value, for: themeManager.mode)
-        cell.configure(with: model.conversation.getMessage(for: indexPath))
+        cell.configure(with: model.conversation.messages[indexPath.row])
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
 
         return cell

@@ -12,7 +12,7 @@ class MessageCell: UITableViewCell {
     private var outputMessageColor = UIColor(hex: "#DCF7C5") ?? UIColor.systemGreen
     private var inputMessageColor = UIColor(hex: "#DFDFDF") ?? UIColor.systemGray
     
-    private let bubbleMaxWidthMultiplier: CGFloat = 0.7
+    private let bubbleMaxWidthMultiplier: CGFloat = 0.8
     
     lazy var bubble: BubbleView = {
         let bubble = BubbleView()
@@ -48,6 +48,13 @@ class MessageCell: UITableViewCell {
         return textView
     }()
     
+    lazy var senderName: UILabel = {
+        let l = UILabel()
+        l.font = UIFont.systemFont(ofSize: 13, weight: .light).italic
+        l.textAlignment = .center
+        return l
+    }()
+    
     var incomingConstraints: [NSLayoutConstraint] {
         [ bubble.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor) ]
     }
@@ -80,6 +87,7 @@ class MessageCell: UITableViewCell {
     private func initialSetup() {
         selectionStyle = .none
         bubble.contentView = textView
+        bubble.senderName = senderName
         backgroundColor = .none
         
         Utils.debug {
@@ -101,6 +109,7 @@ class MessageCell: UITableViewCell {
         outputMessageColor = theme.outgoingBubble
         inputMessageColor = theme.incomingBubble
         textView.textColor = theme.primaryText
+        senderName.textColor = theme.primaryText
     }
 }
 
@@ -112,7 +121,9 @@ extension MessageCell: IConfigurable {
         bubble.activateConstraints(for: direction)
         setColor(for: direction)
         
-        if let textMessage = model as? TextMessage {
+        senderName.text = model.senderName
+        
+        if let textMessage = model as? ITextMessage {
             textView.text = textMessage.text
         }
     }

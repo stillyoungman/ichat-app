@@ -47,7 +47,7 @@ import UIKit
     }
     private var userName: String? {
         didSet {
-            guard let userName = userName, !userName.isEmpty else { return }
+            guard let userName = userName, !userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { userInitials = ""; return }
             let userNameChunks = userName.split(separator: " ").map({ Array($0) })
             userInitials = "\(String(userNameChunks[0][0]).uppercased())\(userNameChunks.count > 1 && userNameChunks[1].count > 1 ? String(userNameChunks[1][0]).uppercased() : "")"
         }

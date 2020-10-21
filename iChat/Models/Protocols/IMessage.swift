@@ -14,7 +14,13 @@ protocol IMessage {
     var deliveryStatus: DeliveryStatus { get }
     
     var senderUid: String { get }
-    var isOutgoing: Bool { get }
+    var senderName: String { get }
+    
+    var deviceUid: String { get }
     
     var date: Date { get }
+}
+
+extension IMessage {
+    var isOutgoing: Bool { deviceUid == senderUid }
 }

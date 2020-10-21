@@ -44,20 +44,21 @@ class UserProfileManager: IProfileInfoProvider {
     let dispatchGroup = DispatchGroup()
     private init() {
         self.dispatchGroup.enter()
-        get { err, prof in
+        get { [weak self] err, prof in
+            guard let sSelf = self else { return }
             if err != nil {
                 fatalError("Unable to read user profile")
             }
             if prof == nil {
                 //initial save
-                self.save(profile: self.`default`) { e in
+                sSelf.save(profile: sSelf.`default`) { e in
                     if e != nil { fatalError("Unable to persist default user profile") }
                 }
-                self._profile = self.`default`
+                sSelf._profile = sSelf.`default`
             } else {
-                self._profile = prof
+                sSelf._profile = prof
             }
-            self.dispatchGroup.leave()
+            sSelf.dispatchGroup.leave()
         }
         dispatchGroup.wait()
     }
