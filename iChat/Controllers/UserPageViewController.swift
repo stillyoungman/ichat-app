@@ -72,38 +72,12 @@ class UserPageViewController: GuidedViewController, IStoryboardViewController, I
         return stackView
     }()
     
-//    lazy var wrapper: UILayoutGuide = {
-//        let guide = UILayoutGuide()
-//        view.addLayoutGuide(guide)
-//        return guide
-//    }()
-    
     var profile: ProfileInfo {
         ProfileInfo(username: userName.text ?? "",
                     about: about.text,
                     location: location.text ?? "",
                     image: avatarView.image)
     }
-    
-//    var currentLayoutConstraints: [NSLayoutConstraint] = []
-//    
-//    lazy var defaultLayoutConstraints: [NSLayoutConstraint] = {
-//       [
-//            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-//            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-//            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-//            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-//        ]
-//    }()
-//    
-//    func shiftedToTopConstraints(by value: CGFloat) -> [NSLayoutConstraint] {
-//        [
-//            self.wrapper.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-//            self.wrapper.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-//            self.wrapper.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -value),
-//            self.wrapper.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -value)
-//        ]
-//    }
     
     lazy var backButton = UIBarButtonItem(title: "Back",
                                      style: UIBarButtonItem.Style.plain,
@@ -125,8 +99,8 @@ class UserPageViewController: GuidedViewController, IStoryboardViewController, I
     
     fileprivate lazy var state: AvatarState = {
         let state = AvatarState()
-        state.isEditingChanged = isEditingChanged
-        state.changeStateChanged = changingStateWasChanged
+        state.isEditingChanged = { [weak self] in self?.isEditingChanged() }
+        state.changeStateChanged = { [weak self] in self?.changingStateWasChanged() }
         return state
     }()
     
@@ -147,10 +121,6 @@ class UserPageViewController: GuidedViewController, IStoryboardViewController, I
         setupConstraints()
         
         navigationItem.rightBarButtonItem = editProfileButton
-    }
-    
-    deinit {
-        unsubsribe()
     }
     
     private func initialSetup() {
@@ -335,14 +305,14 @@ extension UserPageViewController {
     private func presentAlertViewController() {
         let vc = UIAlertController(title: nil, message: "Choose source of picture", preferredStyle: .actionSheet)
         
-        let takePhoto = UIAlertAction(title: "Take Photo", style: .default ) { _ in
+        let takePhoto = UIAlertAction(title: "Take Photo", style: .default ) { [weak self] _ in
             vc.dismiss(animated: true)
-            self.presentCameraImagePicker()
+            self?.presentCameraImagePicker()
         }
         
-        let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { _ in
+        let photoLibrary = UIAlertAction(title: "Photo Library", style: .default) { [weak self] _ in
             vc.dismiss(animated: true)
-            self.presentLibraryPhotosImagePicker()
+            self?.presentLibraryPhotosImagePicker()
         }
         let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in vc.dismiss(animated: true) }
         vc.addAction(takePhoto)

@@ -45,6 +45,10 @@ class GuidedViewController: UIViewController {
     open var shiftMultiplier: CGFloat {
         return 1
     }
+    
+    deinit {
+        unsubsribe()
+    }
 }
 
 // MARK: - Keyboard show/dismiss handlers
@@ -56,8 +60,8 @@ extension GuidedViewController {
             currentLayoutConstraints = shiftedConstraints(by: keyboardSize.height * shiftMultiplier)
             currentLayoutConstraints.activate()
             self.view.needsUpdateConstraints()
-            UIView.animate(withDuration: duration + 0.5) {
-                self.view.layoutIfNeeded()
+            UIView.animate(withDuration: duration + 0.5) { [weak self] in
+                self?.view.layoutIfNeeded()
             }
         }
     }
@@ -68,8 +72,8 @@ extension GuidedViewController {
         currentLayoutConstraints.activate()
         self.view.needsUpdateConstraints()
         if let duration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double {
-            UIView.animate(withDuration: duration) {
-                self.view.layoutIfNeeded()
+            UIView.animate(withDuration: duration) { [weak self] in
+                self?.view.layoutIfNeeded()
             }
         }
     }
