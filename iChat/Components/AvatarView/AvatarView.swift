@@ -27,6 +27,11 @@ import UIKit
     private var userInitials: String? {
         didSet {
             userInitialsLabel.text = userInitials
+            
+            // probably, may affect performance (for example in long UITableView)
+            userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * fontSizeMultiplier,
+                   height: bounds.height * fontSizeMultiplier),
+            maxFontSize: maxFontSize)
         }
     }
     
@@ -94,10 +99,6 @@ extension AvatarView {
         imageView.frame = bounds
         
         userInitialsLabel.frame = bounds
-        
-        userInitialsLabel.fitFontForSize(CGSize(width: bounds.width * fontSizeMultiplier,
-                                                height: bounds.height * fontSizeMultiplier),
-                                         maxFontSize: maxFontSize)
     }
     
     override func prepareForInterfaceBuilder() {

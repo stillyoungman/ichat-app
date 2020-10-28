@@ -30,6 +30,7 @@ class ConversationCell: UITableViewCell, INibView {
         }
     }
     
+    // touch `isOnline` to invoke didSet
     private func updateBackroundColor() {
         isOnline = !(!isOnline)
     }

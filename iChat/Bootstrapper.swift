@@ -19,7 +19,6 @@ class Bootstrapper {
     }()
     
     private static func configure(_ container: IContainer) {
-        container.register(ConversationsInfoProvider.instance as IConversationsInfoProvider)
         container.register(for: .singleton) { _ in ConversationProvider() as IConversationsProvider }
         container.register(UserProfileManager.shared as IProfileInfoProvider)
         container.register(ThemeManager.shared as IThemeManager)

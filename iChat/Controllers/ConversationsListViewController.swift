@@ -41,8 +41,8 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     lazy var addChannelAction: UIAlertAction = {
         let add = UIAlertAction(title: "Create", style: .default) { [weak self] _ in
             guard let sSelf = self,
-                let name = sSelf.newChannelAlertController.textFields?.first?.text
-                else { return }
+                let name = sSelf.newChannelAlertController.textFields?.first?.text?.trimmed
+                    else { return }
             
             sSelf.newChannelAlertController.textFields?.first?.text = nil
             sSelf.channelsProvider.create(Channel(identifier: "", name: name, lastMessage: nil, lastActivity: nil, ownerId: UIDevice.vendorUid ))
@@ -133,7 +133,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         present(newChannelAlertController, animated: true)
     }
     @objc func newChannelTextFieldValueChanged(sender: UITextField) {
-        addChannelAction.isEnabled = sender.text?.count ?? 0 > 0
+        addChannelAction.isEnabled = !sender.text.isNilOrEmpty
     }
     
     func setupAppearance() {

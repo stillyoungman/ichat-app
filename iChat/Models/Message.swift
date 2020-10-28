@@ -23,6 +23,8 @@ extension Message {
         if let content = data["content"] as? String,
         let created = (data["created"] as? IDateConvertable)?.date,
         let senderId = data["senderId"] as? String {
+            if content.isEmpty { return nil } // prevent serialization of empty messages
+            
             self.content = content
             self.created = created
             self.senderId = senderId

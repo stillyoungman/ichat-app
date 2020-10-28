@@ -53,7 +53,6 @@
 		AD830B36253724C500C70641 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD830B35253724C500C70641 /* TextField.swift */; };
 		ADA1D212252300810037D6AC /* ConversationsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA1D211252300810037D6AC /* ConversationsListViewController.swift */; };
 		ADA1D214252300E60037D6AC /* ConversationsList.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADA1D213252300E60037D6AC /* ConversationsList.storyboard */; };
-		ADA1D216252313800037D6AC /* INibView+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA1D215252313800037D6AC /* INibView+Utils.swift */; };
 		ADA1D218252330670037D6AC /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADA1D217252330670037D6AC /* Date.swift */; };
 		ADAB6296252E45980059616E /* Themes.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADAB6295252E45980059616E /* Themes.storyboard */; };
 		ADAB6298252E474A0059616E /* ThemeMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAB6297252E474A0059616E /* ThemeMode.swift */; };
@@ -65,7 +64,6 @@
 		ADAE8D82253F7EE400D4A3C7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ADAE8D81253F7EE300D4A3C7 /* GoogleService-Info.plist */; };
 		ADAE8D84253F7F7E00D4A3C7 /* ChannelsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADAE8D83253F7F7E00D4A3C7 /* ChannelsProvider.swift */; };
 		ADB01E632522CD020083DE29 /* IConversationsInfoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB01E622522CD020083DE29 /* IConversationsInfoProvider.swift */; };
-		ADB01E662522D0640083DE29 /* ConversationsInfoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB01E652522D0640083DE29 /* ConversationsInfoProvider.swift */; };
 		ADB5EEF6252E19D800839CB7 /* IProfileInfoProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5EEF5252E19D800839CB7 /* IProfileInfoProvider.swift */; };
 		ADB5EEF8252E19EE00839CB7 /* IProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB5EEF7252E19EE00839CB7 /* IProfileInfo.swift */; };
 		ADB75003252DD0A70084776E /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB75002252DD0A70084776E /* Container.swift */; };
@@ -170,7 +168,6 @@
 		AD830B35253724C500C70641 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		ADA1D211252300810037D6AC /* ConversationsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsListViewController.swift; sourceTree = "<group>"; };
 		ADA1D213252300E60037D6AC /* ConversationsList.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ConversationsList.storyboard; sourceTree = "<group>"; };
-		ADA1D215252313800037D6AC /* INibView+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "INibView+Utils.swift"; sourceTree = "<group>"; };
 		ADA1D217252330670037D6AC /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		ADAB6295252E45980059616E /* Themes.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Themes.storyboard; sourceTree = "<group>"; };
 		ADAB6297252E474A0059616E /* ThemeMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeMode.swift; sourceTree = "<group>"; };
@@ -182,7 +179,6 @@
 		ADAE8D81253F7EE300D4A3C7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		ADAE8D83253F7F7E00D4A3C7 /* ChannelsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelsProvider.swift; sourceTree = "<group>"; };
 		ADB01E622522CD020083DE29 /* IConversationsInfoProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IConversationsInfoProvider.swift; sourceTree = "<group>"; };
-		ADB01E652522D0640083DE29 /* ConversationsInfoProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsInfoProvider.swift; sourceTree = "<group>"; };
 		ADB5EEF5252E19D800839CB7 /* IProfileInfoProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IProfileInfoProvider.swift; sourceTree = "<group>"; };
 		ADB5EEF7252E19EE00839CB7 /* IProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IProfileInfo.swift; sourceTree = "<group>"; };
 		ADB75002252DD0A70084776E /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
@@ -385,7 +381,6 @@
 			children = (
 				ADB5EEF4252E19C700839CB7 /* Protocols */,
 				ADF7014F2537B0A900AEF0E9 /* BasePersistenceManager.swift */,
-				ADB01E652522D0640083DE29 /* ConversationsInfoProvider.swift */,
 				AD4F04D72537A1D40056C2B0 /* GPersistanceManager.swift */,
 				AD4F04CF25378AA90056C2B0 /* IPersistenceManager.swift */,
 				AD4F04D92537ADA90056C2B0 /* OProfileInfoProvider.swift */,
@@ -533,18 +528,17 @@
 			children = (
 				AD713530253F8EF900064709 /* Firebase */,
 				AD713533253F8F3D00064709 /* UIKit */,
+				ADCAFBBA252ADF3B00DCF840 /* Array+Utils.swift */,
+				ADFAAE8C2526F74C0063CD4C /* CGFloat.swift */,
 				AD47F304251BC78800F9DDF5 /* CGRect.swift */,
+				ADE850B6252522720017C3C9 /* CGSize.swift */,
 				ADA1D217252330670037D6AC /* Date.swift */,
+				AD4F04D5253792060056C2B0 /* FileManager.swift */,
 				ADE850A62524BD6A0017C3C9 /* IConversationInfo+Utils.swift */,
-				ADA1D215252313800037D6AC /* INibView+Utils.swift */,
 				ADEE9B74250C9152009E6518 /* Logging.swift */,
 				ADE850B0252509DB0017C3C9 /* NSAttributedString.swift */,
 				ADEE9B72250C8827009E6518 /* String.swift */,
 				ADEE9B7D250CB8A2009E6518 /* TypeName.swift */,
-				ADE850B6252522720017C3C9 /* CGSize.swift */,
-				ADFAAE8C2526F74C0063CD4C /* CGFloat.swift */,
-				ADCAFBBA252ADF3B00DCF840 /* Array+Utils.swift */,
-				AD4F04D5253792060056C2B0 /* FileManager.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -772,7 +766,6 @@
 				ADA1D212252300810037D6AC /* ConversationsListViewController.swift in Sources */,
 				AD38A77D252E0CA500A81ED5 /* IConversationProvider.swift in Sources */,
 				AD691741252B7C9600807E20 /* IGroupConversation.swift in Sources */,
-				ADA1D216252313800037D6AC /* INibView+Utils.swift in Sources */,
 				ADEE9B73250C8827009E6518 /* String.swift in Sources */,
 				ADC0F22A2523838A0050B0D8 /* ConversationType.swift in Sources */,
 				ADE850B7252522720017C3C9 /* CGSize.swift in Sources */,
@@ -828,7 +821,6 @@
 				AD4F04D6253792060056C2B0 /* FileManager.swift in Sources */,
 				ADE850AB2524C2910017C3C9 /* ConversationViewController.swift in Sources */,
 				ADB5EEF6252E19D800839CB7 /* IProfileInfoProvider.swift in Sources */,
-				ADB01E662522D0640083DE29 /* ConversationsInfoProvider.swift in Sources */,
 				AD71352F253F8E7C00064709 /* IDateConvertable.swift in Sources */,
 				AD4F04D425378FBA0056C2B0 /* UserProfileManager.swift in Sources */,
 				AD830B36253724C500C70641 /* TextField.swift in Sources */,
