@@ -26,10 +26,6 @@ class NSManagedChannel: NSManagedObject {
     @NSManaged var ownerId: String?
     
     @NSManaged var messages: NSSet?
-    
-    static func fetchRequest() -> NSFetchRequest<NSManagedChannel> {
-        return NSFetchRequest<NSManagedChannel>(entityName: "Channel")
-    }
 }
 
 extension NSManagedChannel {

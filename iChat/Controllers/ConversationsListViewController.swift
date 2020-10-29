@@ -156,6 +156,9 @@ extension ConversationsListViewController: AvatarViewDelegate {
     }
     
     private func presentUserPageController() {
+        
+        
+        
         let profileInfoProvider: IProfileInfoProvider = container.resolve()
         let userPageVC = UserPageViewController.instantiate(container: container,
                                                             with: profileInfoProvider.profile)

@@ -25,10 +25,10 @@ extension IPersistentStorage {
     
     func persist(_ messages: [Message], of channelUid: String) {
         self.performSave {
-            let fetchRequest: NSFetchRequest<NSManagedChannel> = NSManagedChannel.fetchRequest()
+            let fetchRequest = NSManagedChannel.fetchRequest()
             fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(NSManagedChannel.identifier), channelUid)
             do {
-                guard let channel = (try $0.fetch(fetchRequest)).first else { return }
+                guard let channel = (try $0.fetch(fetchRequest) as? [NSManagedChannel])?.first else { return }
                 for message in messages {
                     debug { sleep(1) }
                     let message = NSManagedMessage(message, of: $0)

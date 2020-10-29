@@ -15,8 +15,6 @@ class CoreDataStack: IPersistentStorage {
         enableObservers()
     }
     
-    var dataWereChanaged: ((CoreDataStack) -> Void)?
-    
     var chatObjectModel: NSManagedObjectModel {
         guard let modelURL = Bundle.main.url(forResource: "Chat", withExtension: "momd")
             else { fatalError("Model not found") }
@@ -72,7 +70,7 @@ class CoreDataStack: IPersistentStorage {
     private lazy var writerContext: NSManagedObjectContext = {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.persistentStoreCoordinator = persistentStoreCoordinator
-        context.mergePolicy = NSOverwriteMergePolicy
+        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
         return context
     }()
     
@@ -99,18 +97,20 @@ class CoreDataStack: IPersistentStorage {
         context.performAndWait {
             populate(context)
             if context.hasChanges {
-                do {
-                    try performSave(in: context)
-                } catch {
-                    assertionFailure(error.localizedDescription)
-                }
+                performSave(in: context)
             }
         }
     }
     
-    private func performSave(in context: NSManagedObjectContext) throws {
-        try context.save()
-        if let parent = context.parent { try performSave(in: parent) }
+    private func performSave(in context: NSManagedObjectContext) {
+        context.performAndWait {
+            do {
+                try context.save()
+            } catch {
+                assertionFailure(error.localizedDescription)
+            }
+        }
+        if let parent = context.parent { performSave(in: parent) }
     }
     
     // MARK: - Observers and Logs
@@ -127,8 +127,6 @@ class CoreDataStack: IPersistentStorage {
     private func contextObjectsDidChange(notification: NSNotification) {
         guard let userInfo = notification.userInfo else { return }
         
-        dataWereChanaged?(self)
-        
         if let inserts = userInfo[NSInsertedObjectsKey] as? Set<NSManagedObject>,
             inserts.count > 0 {
             "Inserted: \(inserts.count)".log()
@@ -143,6 +141,8 @@ class CoreDataStack: IPersistentStorage {
             deletes.count > 0 {
             "Deleted: \(deletes.count)".log()
         }
+        
+        debug { printInfo() }
     }
     
     func printInfo() {
