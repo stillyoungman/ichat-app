@@ -25,6 +25,8 @@ class Bootstrapper {
         container.register(ThemeManager.shared as IThemeProvider)
         container.register(ChannelsProvider.shared as IChannelsProvider)
         container.register(for: .singleton) { _ in CoreDataStack.shared as IPersistentStorage }
+        
+        container.register(for: .perRequest, factory: ControllersFactory.userPageViewController)
     }
     
     static func initApplication(_ window: UIWindow) {

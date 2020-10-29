@@ -156,19 +156,13 @@ extension ConversationsListViewController: AvatarViewDelegate {
     }
     
     private func presentUserPageController() {
+        let userPageVC: UserPageViewController = container.resolve()
         
-        
-        
-        let profileInfoProvider: IProfileInfoProvider = container.resolve()
-        let userPageVC = UserPageViewController.instantiate(container: container,
-                                                            with: profileInfoProvider.profile)
-        let presentingView = UINavigationController(rootViewController: userPageVC)
-        presentingView.setupAppearance(with: themeProvider)
         userPageVC.profileHasBeenChanged = { [weak self] p in
             DQ.main.async { self?.avatarView.image = p.image }
         }
         
-        self.present(presentingView, animated: true)
+        self.present(userPageVC.forPresentation, animated: true)
     }
 }
 
