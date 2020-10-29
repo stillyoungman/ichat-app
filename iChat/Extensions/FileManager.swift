@@ -10,7 +10,13 @@ import Foundation
 import UIKit
 
 extension FileManager {
-    var documents: URL {
-        self.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    static var documentsURL: URL {
+        do {
+            return try FileManager
+            .default
+            .url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        } catch {
+            fatalError("Uable to get access to `documentsURL`")
+        }
     }
 }

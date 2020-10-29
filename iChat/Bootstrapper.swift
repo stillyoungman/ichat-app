@@ -24,10 +24,18 @@ class Bootstrapper {
         container.register(ThemeManager.shared as IThemeManager)
         container.register(ThemeManager.shared as IThemeProvider)
         container.register(ChannelsProvider.shared as IChannelsProvider)
+        container.register(for: .singleton) { _ in CoreDataStack.shared as IPersistentStorage }
     }
     
     static func initApplication(_ window: UIWindow) {
         window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.instantiate(container: container))
+        
+        DQ.global(qos: .utility).async {
+            CoreDataStack.shared.performSave { context in
+                _ = NSManagedChannel("1", "test4", of: context)
+            }
+        }
+        
         window.makeKeyAndVisible()
     }
 }

@@ -47,10 +47,12 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
     var model: IConversationViewModel!
     var themeManager: IThemeProvider!
     var profileProvider: IProfileInfoProvider!
+    var storage: IPersistentStorage!
     
     func setupDependencies(with container: IServiceResolver) {
         themeManager = container.resolve(for: IThemeProvider.self)
         profileProvider = container.resolve(for: IProfileInfoProvider.self)
+        storage = container.resolve(for: IPersistentStorage.self)
     }
     
     func configure(with model: IConversationViewModel) {
@@ -72,6 +74,13 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
         sendButton.setTitleColor(themeManager.value.navTintColor, for: .normal)
         model.conversation.subscribe { [weak self] in
             guard let sSelf = self else { return }
+            
+            DQ.global(qos: .utility).async {
+                let channelUid = sSelf.model.conversation.channelUid
+                let messages = sSelf.model.conversation.messages
+                sSelf.storage.persist(messages, of: channelUid)
+            }
+            
             sSelf.tableView.reloadData()
         }
     }

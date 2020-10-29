@@ -8,12 +8,8 @@
 
 import Foundation
 
-class Utils {
-    private init() { }
-    
-    static func debug(action: () -> Void) {
-        #if DEBUGGING_MODE
-        action()
-        #endif
-    }
+func debug(action: () -> Void) {
+    #if DEBUGGING_MODE
+    action()
+    #endif
 }

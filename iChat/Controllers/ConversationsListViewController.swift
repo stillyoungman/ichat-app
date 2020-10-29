@@ -69,11 +69,13 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     private var container: IServiceResolver!
     private var themeProvider: IThemeProvider!
     private var channelsProvider: IChannelsProvider!
+    private var storage: IPersistentStorage!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
         self.channelsProvider = container.resolve(for: IChannelsProvider.self)
         self.themeProvider = container.resolve(for: IThemeProvider.self)
+        self.storage = container.resolve(for: IPersistentStorage.self)
     }
     
     private func configureNavigation() {
@@ -188,8 +190,12 @@ extension ConversationsListViewController {
         super.viewWillAppear(animated)
         configureNavigation()
         channelsProvider.subscribe { [weak self] in
+            guard let sSelf = self else { return }
+            DQ.global(qos: .utility).async {
+                sSelf.storage.persist(sSelf.channelsProvider.items)
+            }
             DQ.main.async {
-                self?.tableView.reloadData()
+                sSelf.tableView.reloadData()
             }
         }
     }
