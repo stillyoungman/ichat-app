@@ -109,14 +109,11 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.leftBarButtonItem = settings
     }
     
-    private func presentConversation(for channelInfo: Channel) {
+    private func presentConversation(for channel: Channel) {
         navigationItem.title = nil
-        let destination = ConversationViewController.instantiate(container: container)
-        let conversationsProvider: IConversationsProvider = container.resolve()
-        let conversation = conversationsProvider.conversation(for: channelInfo.identifier)
-        let viewModel = ConversationViewModel(title: channelInfo.name, conversation: conversation)
-        destination.configure(with: viewModel)
-        self.show(destination, sender: nil)
+        let conversationVC: ConversationViewController = container.resolve()
+        conversationVC.configure(with: channel)
+        self.show(conversationVC.forPresentation, sender: nil)
     }
     
     @objc func presentThemeSettings(_ btn: AnyObject) {

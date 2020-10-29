@@ -27,6 +27,7 @@ class Bootstrapper {
         container.register(for: .singleton) { _ in CoreDataStack.shared as IPersistentStorage }
         
         container.register(for: .perRequest, factory: ControllersFactory.userPageViewController)
+        container.register(for: .perRequest, factory: ControllersFactory.conversationViewController)
     }
     
     static func initApplication(_ window: UIWindow) {

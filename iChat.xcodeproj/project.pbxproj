@@ -100,7 +100,6 @@
 		ADE850A12524B3330017C3C9 /* AppNavigationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850A02524B3330017C3C9 /* AppNavigationViewController.swift */; };
 		ADE850A32524B44A0017C3C9 /* AppNavigationBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850A22524B44A0017C3C9 /* AppNavigationBar.swift */; };
 		ADE850A72524BD6A0017C3C9 /* IConversationInfo+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850A62524BD6A0017C3C9 /* IConversationInfo+Utils.swift */; };
-		ADE850A92524C17A0017C3C9 /* Conversation.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ADE850A82524C17A0017C3C9 /* Conversation.storyboard */; };
 		ADE850AB2524C2910017C3C9 /* ConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850AA2524C2910017C3C9 /* ConversationViewController.swift */; };
 		ADE850AE2524C8030017C3C9 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850AC2524C8030017C3C9 /* MessageCell.swift */; };
 		ADE850B1252509DB0017C3C9 /* NSAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE850B0252509DB0017C3C9 /* NSAttributedString.swift */; };
@@ -223,7 +222,6 @@
 		ADE850A02524B3330017C3C9 /* AppNavigationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationViewController.swift; sourceTree = "<group>"; };
 		ADE850A22524B44A0017C3C9 /* AppNavigationBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationBar.swift; sourceTree = "<group>"; };
 		ADE850A62524BD6A0017C3C9 /* IConversationInfo+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IConversationInfo+Utils.swift"; sourceTree = "<group>"; };
-		ADE850A82524C17A0017C3C9 /* Conversation.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Conversation.storyboard; sourceTree = "<group>"; };
 		ADE850AA2524C2910017C3C9 /* ConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewController.swift; sourceTree = "<group>"; };
 		ADE850AC2524C8030017C3C9 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
 		ADE850B0252509DB0017C3C9 /* NSAttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSAttributedString.swift; sourceTree = "<group>"; };
@@ -385,7 +383,6 @@
 			isa = PBXGroup;
 			children = (
 				ADA1D213252300E60037D6AC /* ConversationsList.storyboard */,
-				ADE850A82524C17A0017C3C9 /* Conversation.storyboard */,
 				ADAB6295252E45980059616E /* Themes.storyboard */,
 			);
 			path = Screens;
@@ -520,13 +517,13 @@
 				AD6630DA251B68AA008D6718 /* Controllers */,
 				ADEE9B71250C8567009E6518 /* Extensions */,
 				ADDCE2AC250BD8A900D67C05 /* AppDelegate.swift */,
-				ADDCE2AE250BD8A900D67C05 /* SceneDelegate.swift */,
 				ADE85098252436780017C3C9 /* Bootstrapper.swift */,
+				AD00188E254AA6A600187844 /* ControllersFactory.swift */,
+				ADDCE2AE250BD8A900D67C05 /* SceneDelegate.swift */,
 				ADDCE2B7250BD8AB00D67C05 /* LaunchScreen.storyboard */,
 				ADDCE2BA250BD8AB00D67C05 /* Info.plist */,
 				ADAE8D81253F7EE300D4A3C7 /* GoogleService-Info.plist */,
 				ADDCE2D1250BE5FD00D67C05 /* Assets.xcassets */,
-				AD00188E254AA6A600187844 /* ControllersFactory.swift */,
 			);
 			path = iChat;
 			sourceTree = "<group>";
@@ -681,7 +678,6 @@
 				ADA1D214252300E60037D6AC /* ConversationsList.storyboard in Resources */,
 				ADDCE2B9250BD8AB00D67C05 /* LaunchScreen.storyboard in Resources */,
 				ADAE8D82253F7EE400D4A3C7 /* GoogleService-Info.plist in Resources */,
-				ADE850A92524C17A0017C3C9 /* Conversation.storyboard in Resources */,
 				AD6630DF251B6C1B008D6718 /* AvatarView.xib in Resources */,
 				ADDCE2D2250BE5FD00D67C05 /* Assets.xcassets in Resources */,
 				ADAB6296252E45980059616E /* Themes.storyboard in Resources */,

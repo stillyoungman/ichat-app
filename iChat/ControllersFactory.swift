@@ -22,4 +22,10 @@ class ControllersFactory {
         
         return userPageVC
     }
+    
+    static func conversationViewController(container: IContainer) -> ConversationViewController {
+        let controller = ConversationViewController()
+        controller.setupDependencies(with: container)
+        return controller
+    }
 }
