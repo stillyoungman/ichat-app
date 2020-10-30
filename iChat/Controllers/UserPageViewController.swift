@@ -11,7 +11,7 @@ import Photos
 
 // TODO: Handle avatar save
 // TODO: Add remove image
-class UserPageViewController: GuidedViewController, IStoryboardViewController, IConfigurable {
+class UserPageViewController: GuidedViewController, IConfigurable {
     
     lazy var avatarView: AvatarView = {
         let a = AvatarView.fromNib()

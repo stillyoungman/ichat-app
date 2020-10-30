@@ -10,7 +10,7 @@ import Foundation
 
 protocol IConversation {
     var channelUid: String { get }
-    var messages: [IMessage] { get }
+    var messages: [Message] { get }
     
     func send(_ content: String, from user: String)
     

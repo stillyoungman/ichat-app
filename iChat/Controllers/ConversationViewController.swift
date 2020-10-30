@@ -32,7 +32,7 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
         guard let text = inputTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
         if text.isEmpty { inputTextField.text = nil; return }
         
-        model.conversation.send(text, from: profileProvider.profile.username)
+        conversation.send(text, from: profileProvider.profile.username)
         inputTextField.text = nil
     }
     
@@ -44,18 +44,22 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
         return i
     }()
     
-    var model: IConversationViewModel!
     var themeManager: IThemeProvider!
     var profileProvider: IProfileInfoProvider!
+    var storage: IPersistentStorage!
+    var conversationProvider: IConversationsProvider!
+    var conversation: IConversation!
     
     func setupDependencies(with container: IServiceResolver) {
         themeManager = container.resolve(for: IThemeProvider.self)
         profileProvider = container.resolve(for: IProfileInfoProvider.self)
+        storage = container.resolve(for: IPersistentStorage.self)
+        conversationProvider = container.resolve(for: IConversationsProvider.self)
     }
     
-    func configure(with model: IConversationViewModel) {
-        self.model = model
-        self.title = model.title
+    func configure(with channel: Channel) {
+        self.title = channel.name
+        conversation = conversationProvider.conversation(for: channel.identifier)
     }
     
     override func viewDidLoad() {
@@ -70,15 +74,22 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         sendButton.setTitleColor(themeManager.value.navTintColor, for: .normal)
-        model.conversation.subscribe { [weak self] in
+        conversation.subscribe { [weak self] in
             guard let sSelf = self else { return }
+            
+            DQ.global(qos: .utility).async {
+                let channelUid = sSelf.conversation.channelUid
+                let messages = sSelf.conversation.messages
+                sSelf.storage.persist(messages, of: channelUid)
+            }
+            
             sSelf.tableView.reloadData()
         }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        model.conversation.unsubscribe()
+        conversation.unsubscribe()
     }
     
     private func configureNavigation() {
@@ -107,7 +118,7 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
 // MARK: - UITableViewDataSource
 extension ConversationViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        model.conversation.messages.count
+        conversation.messages.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -115,7 +126,7 @@ extension ConversationViewController: UITableViewDataSource {
             else { fatalError("Unable cast the cell to \(MessageCell.typeName)") }
         
         cell.apply(themeManager.value, for: themeManager.mode)
-        cell.configure(with: model.conversation.messages[indexPath.row])
+        cell.configure(with: conversation.messages[indexPath.row])
         cell.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi))
 
         return cell

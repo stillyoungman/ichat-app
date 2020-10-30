@@ -22,7 +22,7 @@ class FirebaseConversation: IConversation {
         self.channelUid = uid
     }
     
-    var messages: [IMessage] = []
+    var messages: [Message] = []
     var dates: [Date] = []
     
     func subscribe(_ messagesChangedHandler: @escaping () -> Void) {

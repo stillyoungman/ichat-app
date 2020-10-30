@@ -90,7 +90,7 @@ class MessageCell: UITableViewCell {
         bubble.senderName = senderName
         backgroundColor = .none
         
-        Utils.debug {
+        debug {
             backgroundColor = .systemPink
             contentView.backgroundColor = .yellow
         }

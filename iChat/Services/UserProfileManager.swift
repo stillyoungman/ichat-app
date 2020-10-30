@@ -16,7 +16,7 @@ class UserProfileManager: IProfileInfoProvider {
     private let persistenceManager: IPersistenceManager = GPersistenceManager()
     
     var _profile: IProfileInfo!
-    let profileURL = FileManager.default.documents.appendingPathComponent("profile.bin")
+    let profileURL = FileManager.documentsURL.appendingPathComponent("profile.bin")
     
     let `default` = ProfileInfo(username: "Constantine Nikolsky",
                                             about: "Junior iOS developer",

@@ -69,11 +69,13 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     private var container: IServiceResolver!
     private var themeProvider: IThemeProvider!
     private var channelsProvider: IChannelsProvider!
+    private var storage: IPersistentStorage!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
         self.channelsProvider = container.resolve(for: IChannelsProvider.self)
         self.themeProvider = container.resolve(for: IThemeProvider.self)
+        self.storage = container.resolve(for: IPersistentStorage.self)
     }
     
     private func configureNavigation() {
@@ -107,14 +109,11 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.leftBarButtonItem = settings
     }
     
-    private func presentConversation(for channelInfo: Channel) {
+    private func presentConversation(for channel: Channel) {
         navigationItem.title = nil
-        let destination = ConversationViewController.instantiate(container: container)
-        let conversationsProvider: IConversationsProvider = container.resolve()
-        let conversation = conversationsProvider.conversation(for: channelInfo.identifier)
-        let viewModel = ConversationViewModel(title: channelInfo.name, conversation: conversation)
-        destination.configure(with: viewModel)
-        self.show(destination, sender: nil)
+        let conversationVC: ConversationViewController = container.resolve()
+        conversationVC.configure(with: channel)
+        self.show(conversationVC.forPresentation, sender: nil)
     }
     
     @objc func presentThemeSettings(_ btn: AnyObject) {
@@ -154,16 +153,13 @@ extension ConversationsListViewController: AvatarViewDelegate {
     }
     
     private func presentUserPageController() {
-        let profileInfoProvider: IProfileInfoProvider = container.resolve()
-        let userPageVC = UserPageViewController.instantiate(container: container,
-                                                            with: profileInfoProvider.profile)
-        let presentingView = UINavigationController(rootViewController: userPageVC)
-        presentingView.setupAppearance(with: themeProvider)
+        let userPageVC: UserPageViewController = container.resolve()
+        
         userPageVC.profileHasBeenChanged = { [weak self] p in
             DQ.main.async { self?.avatarView.image = p.image }
         }
         
-        self.present(presentingView, animated: true)
+        self.present(userPageVC.forPresentation, animated: true)
     }
 }
 
@@ -188,8 +184,12 @@ extension ConversationsListViewController {
         super.viewWillAppear(animated)
         configureNavigation()
         channelsProvider.subscribe { [weak self] in
+            guard let sSelf = self else { return }
+            DQ.global(qos: .utility).async {
+                sSelf.storage.persist(sSelf.channelsProvider.items)
+            }
             DQ.main.async {
-                self?.tableView.reloadData()
+                sSelf.tableView.reloadData()
             }
         }
     }

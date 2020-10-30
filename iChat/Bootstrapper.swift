@@ -24,10 +24,15 @@ class Bootstrapper {
         container.register(ThemeManager.shared as IThemeManager)
         container.register(ThemeManager.shared as IThemeProvider)
         container.register(ChannelsProvider.shared as IChannelsProvider)
+        container.register(for: .singleton) { _ in CoreDataStack.shared as IPersistentStorage }
+        
+        container.register(for: .perRequest, factory: ControllersFactory.userPageViewController)
+        container.register(for: .perRequest, factory: ControllersFactory.conversationViewController)
     }
     
     static func initApplication(_ window: UIWindow) {
         window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.instantiate(container: container))
+        
         window.makeKeyAndVisible()
     }
 }
