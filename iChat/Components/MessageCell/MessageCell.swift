@@ -9,6 +9,8 @@
 import UIKit
 
 class MessageCell: UITableViewCell {
+    static var _appContext: ApplicationContext?
+    
     private var outputMessageColor = UIColor(hex: "#DCF7C5") ?? UIColor.systemGreen
     private var inputMessageColor = UIColor(hex: "#DFDFDF") ?? UIColor.systemGray
     
@@ -110,21 +112,5 @@ class MessageCell: UITableViewCell {
         inputMessageColor = theme.incomingBubble
         textView.textColor = theme.primaryText
         senderName.textColor = theme.primaryText
-    }
-}
-
-extension MessageCell: IConfigurable {
-    
-    func configure(with model: IMessage) {
-        let direction: Direction = model.isOutgoing ? .out : .in
-        activateConstraints(for: direction)
-        bubble.activateConstraints(for: direction)
-        setColor(for: direction)
-        
-        senderName.text = model.senderName
-        
-        if let textMessage = model as? ITextMessage {
-            textView.text = textMessage.text
-        }
     }
 }

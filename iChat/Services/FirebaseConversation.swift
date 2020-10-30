@@ -11,7 +11,6 @@ import Firebase
 
 class FirebaseConversation: IConversation {
     let channelUid: String
-    static let deviceUid: String = UIDevice.vendorUid
     
     lazy var db = Firestore.firestore()
     lazy var channel = db.collection("channels").document(channelUid)
@@ -34,7 +33,7 @@ class FirebaseConversation: IConversation {
             } else {
                 guard let sSelf = self, let snapshot = querySnapshot else { return }
                 sSelf.messages = snapshot.documents
-                    .compactMap { Message(with: $0, deviceUid: FirebaseConversation.deviceUid) } 
+                    .compactMap { Message(with: $0) }
                     .sorted { $0.date > $1.date }
                 messagesChangedHandler()
             }

@@ -31,8 +31,16 @@ class Bootstrapper {
     }
     
     static func initApplication(_ window: UIWindow) {
+        configureComponents()
+        
         window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.instantiate(container: container))
         
         window.makeKeyAndVisible()
+    }
+    
+    static func configureComponents() {
+        let appContext = ApplicationContext(deviceUid: UIDevice.vendorUid)
+        ConversationCell.initialize(with: appContext)
+        MessageCell.initialize(with: appContext)
     }
 }

@@ -8,8 +8,10 @@
 
 import UIKit
 
-class ConversationCell: UITableViewCell, INibView {
-    private(set) var model: Channel?
+class ConversationCell: UITableViewCell {
+    static var _appContext: ApplicationContext?
+    
+    private(set) var model: Channel!
     
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var rightChevronView: UIView!
@@ -24,22 +26,24 @@ class ConversationCell: UITableViewCell, INibView {
         b.imageView?.contentMode = .scaleAspectFit
         return b
     }()
-    var isOnline: Bool = false {
-        didSet {
-            backgroundColor = isOnline ? .softYellow : .none
-        }
+    
+    private func setBackroundColor(_ selected: Bool = false) {
+        backgroundColor = selected
+            ? ConversationCell.selectedBackroundColor
+            : isMineConversation ? ConversationCell.mineConversationBackroundColor : ConversationCell.defaultBackroundColor
     }
     
-    // touch `isOnline` to invoke didSet
-    private func updateBackroundColor() {
-        isOnline = !(!isOnline)
+    var isMineConversation: Bool {
+        model.ownerId == ConversationCell.appContext.deviceUid
     }
     
-    private let lastMessageFontSize: CGFloat = 13
-    private let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
-    private lazy var lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
-    private lazy var noMessagesFont = UIFont(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
-    private let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
+    private static let lastMessageFontSize: CGFloat = 13
+    private static let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
+    private static let lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
+    private static let noMessagesFont = UIFont(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
+    private static let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
+    private static let mineConversationBackroundColor = UIColor.softYellow
+    private static let defaultBackroundColor = UIColor.clear
     
     private func initialSetup() {
         rightChevronView.addSubview(chevron)
@@ -52,7 +56,7 @@ class ConversationCell: UITableViewCell, INibView {
         lastMessage.text = nil
         lastMessage.attributedText = nil
         backgroundColor = .clear
-        lastMessage.font = lastMessageDefaultFont
+        lastMessage.font = ConversationCell.lastMessageDefaultFont
         lastMessage.textColor = UIColor.milkGray
     }
     
@@ -92,18 +96,10 @@ extension ConversationCell {
         
         if animated {
             UIView.animate(withDuration: 0.1, delay: 1.0, options: [], animations: {
-                if selected {
-                    self.backgroundColor = self.selectedBackroundColor
-                } else {
-                    self.updateBackroundColor()
-                }
+                
             }, completion: nil)
         } else {
-            if selected {
-                self.backgroundColor = self.selectedBackroundColor
-            } else {
-                self.updateBackroundColor()
-            }
+            self.setBackroundColor(selected)
         }
     }
 }
@@ -115,11 +111,11 @@ extension ConversationCell: IConfigurable {
     func configure(with model: Channel) {
         self.model = model
         self.name.text = model.name
-        self.isOnline = false
+        setBackroundColor()
         
         if model.hasNoMessages {
             self.lastMessage.text = "No messages yet"
-            self.lastMessage.font = noMessagesFont
+            self.lastMessage.font = ConversationCell.noMessagesFont
             self.lastMessage.textColor = .black
         } else {
             if let lastMessage = model.lastMessage {
@@ -144,7 +140,7 @@ extension ConversationCell: IConfigurable {
         let attributeString = NSMutableAttributedString(string: text)
         let style = NSMutableParagraphStyle()
         style.lineBreakMode = .byTruncatingTail
-        style.lineSpacing = lineSpacing
+        style.lineSpacing = ConversationCell.lineSpacing
         
         attributeString.addAttribute(NSAttributedString.Key.paragraphStyle,
                                      value: style, range: NSRange(location: 0, length: attributeString.length))
