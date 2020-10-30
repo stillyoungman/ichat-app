@@ -61,4 +61,10 @@ extension ChannelsProvider: IChannelsProvider {
     func create(_ channel: Channel) {
         channelsCollection.addDocument(data: channel.data)
     }
+    
+    func remove(_ channel: Channel) {
+        channelsCollection
+            .document(channel.identifier)
+            .delete()
+    }
 }

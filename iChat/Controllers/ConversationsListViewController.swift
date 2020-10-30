@@ -12,6 +12,8 @@ import UIKit
 class ConversationsListViewController: UIViewController, IStoryboardViewController, UINavigationControllerDelegate {
     @IBOutlet private var tableView: UITableView!
     
+    private var channels: [Channel] = []
+    
     lazy var avatarView: AvatarView = {
         let aView = AvatarView.fromNib()
         let profileProvider: IProfileInfoProvider = container.resolve()
@@ -188,6 +190,7 @@ extension ConversationsListViewController {
             DQ.global(qos: .utility).async {
                 sSelf.storage.persist(sSelf.channelsProvider.items)
             }
+            sSelf.channels = sSelf.channelsProvider.items
             DQ.main.async {
                 sSelf.tableView.reloadData()
             }
@@ -215,17 +218,16 @@ extension ConversationsListViewController {
 // MARK: - UITableViewDataSource
 extension ConversationsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        channelsProvider.items.count
+        channels.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? ConversationCell
             else { fatalError("Cast to ConversationCell failed.") }
-        cell.configure(with: channelsProvider.items[indexPath.row])
+        cell.configure(with: channels[indexPath.row])
         cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }
-    
 }
 
 // MARK: - UITableViewDelegate
@@ -240,5 +242,26 @@ extension ConversationsListViewController: UITableViewDelegate {
             else { assert(false, "Unable to unwrap ConversationInfo."); return }
         
         presentConversation(for: channelInfo)
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+
+        // should be able to edit
+        let channel = channels[indexPath.row]
+        if channel.ownerId != UIDevice.vendorUid { return [] }
+    
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (_, indexPath) in
+            self?.channels.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+            self?.channelsProvider.remove(channel)
+        }
+
+//        let edit = UITableViewRowAction(style: .default, title: "Rename") { (action, indexPath) in
+//
+//        }
+//        edit.backgroundColor = UIColor.lightGray
+
+        return [delete]
+
     }
 }
