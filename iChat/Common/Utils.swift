@@ -11,7 +11,7 @@ import Foundation
 class Utils {
     private init() { }
     
-    static func debug(action: () -> ()) {
+    static func debug(action: () -> Void) {
         #if DEBUGGING_MODE
         action()
         #endif

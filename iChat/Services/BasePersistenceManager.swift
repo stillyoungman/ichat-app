@@ -9,7 +9,7 @@
 import Foundation
 
 class BasePersistenceManager: IPersistenceManager {
-    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> ()) {
+    func read<T>(from path: URL, _ completion: @escaping (Error?, T?) -> Void) {
         do {
             guard let data = try? Data(contentsOf: path) else {
                 completion(nil, nil)
@@ -23,22 +23,20 @@ class BasePersistenceManager: IPersistenceManager {
         }
     }
     
-    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist(data: Data, to path: URL, _ completion: @escaping (Error?) -> Void) {
         do {
             try data.write(to: path)
             completion(nil)
-        }
-        catch {
+        } catch {
             completion(AppError())
         }
     }
     
-    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> ()) {
+    func persist<T: NSCoding>(_ item: T, to path: URL, _ completion: @escaping (Error?) -> Void) {
         do {
             let data = try NSKeyedArchiver.archivedData(withRootObject: item, requiringSecureCoding: false)
             self.persist(data: data, to: path, completion)
-        }
-        catch {
+        } catch {
             print(error.localizedDescription)
             completion(AppError())
         }

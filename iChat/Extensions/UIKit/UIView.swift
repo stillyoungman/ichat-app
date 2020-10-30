@@ -19,7 +19,7 @@ public extension UIView {
         }
     }
     
-    func addBorder(borderColor: UIColor = .clear, borderWith: CGFloat = 0, borderCornerRadius: CGFloat? = nil){
+    func addBorder(borderColor: UIColor = .clear, borderWith: CGFloat = 0, borderCornerRadius: CGFloat? = nil) {
         self.layer.borderWidth = borderWith
         self.layer.borderColor = borderColor.cgColor
         self.layer.cornerRadius = borderCornerRadius ?? cornerRadius

@@ -18,7 +18,7 @@ extension NSObject: Logging {
         "\(Self.typeName): \(sign.rawValue) \(functionName)".log()
     }
     
-    func trace(_ sign: Direction = .out, functionName: String = #function){
+    func trace(_ sign: Direction = .out, functionName: String = #function) {
         "\(String(describing: type(of: self))): \(sign.rawValue) \(functionName)".log()
     }
 }

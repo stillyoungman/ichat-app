@@ -8,4 +8,5 @@
 
 import Foundation
 
+// swiftlint:disable:next type_name
 typealias DQ = DispatchQueue

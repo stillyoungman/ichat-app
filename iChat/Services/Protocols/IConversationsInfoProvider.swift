@@ -11,4 +11,3 @@ import Foundation
 protocol IConversationsInfoProvider {
     func conversations(for type: ConversationType) -> AnyCollection<IConversationInfo>
 }
-

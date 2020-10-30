@@ -7,9 +7,22 @@
 //
 
 extension String {
-    func log(){
+    func log() {
         #if ENABLE_CONSOLE_LOGGING
         print(self)
         #endif
+    }
+    
+    var isEmpty: Bool { self.trimmingCharacters(in: .whitespacesAndNewlines).count == 0 }
+    
+    var trimmed: String {
+        self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+extension Optional where Wrapped == String {
+    var isNilOrEmpty: Bool {
+        guard let sSelf = self else { return true }
+        return sSelf.isEmpty
     }
 }

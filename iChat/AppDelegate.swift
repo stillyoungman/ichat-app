@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder {
@@ -17,7 +18,7 @@ class AppDelegate: UIResponder {
 
 extension AppDelegate: UIApplicationDelegate {
     
-    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         printAppState(from: .notRunning, to: .inactive)
         return true
     }
@@ -25,9 +26,16 @@ extension AppDelegate: UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         printAppState(from: .inactive, to: .inactive)
         
-        let window = UIWindow(frame: UIScreen.main.bounds)
-        Bootstrapper.setupRootViewController(window)
-        self.window = window
+        FirebaseApp.configure()
+        
+        // if less than 13 call setupRootViewController from here
+        if #available(iOS 13, *) {
+            
+        } else {
+            let window = UIWindow(frame: UIScreen.main.bounds)
+            Bootstrapper.initApplication(window)
+            self.window = window
+        }
         
         return true
     }
@@ -52,7 +60,7 @@ extension AppDelegate: UIApplicationDelegate {
         printAppState(from: .background, to: .suspended)
     }
     
-    func printAppState(from: ApplicationState, to: ApplicationState, functionName: String = #function){
+    func printAppState(from: ApplicationState, to: ApplicationState, functionName: String = #function) {
         "Application moved from '\(from)' to '\(to)': \(functionName)".log()
     }
     
@@ -75,4 +83,3 @@ extension AppDelegate: UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 }
-

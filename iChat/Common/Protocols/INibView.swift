@@ -21,4 +21,3 @@ extension INibView where Self: UIView {
         return view
     }
 }
-

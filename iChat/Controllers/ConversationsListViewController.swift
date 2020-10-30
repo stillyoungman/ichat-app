@@ -21,10 +21,39 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return aView
     }()
     
-    private let rowHeight = CGFloat(89);
+    lazy var newChannelAlertController: UIAlertController = {
+        let alertController = UIAlertController(title: "New channel", message: "Please, enter name of the channel:", preferredStyle: .alert)
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
+            alertController.textFields?.first?.text = nil
+        }
+        
+        alertController.addAction(cancel)
+        alertController.addAction(self.addChannelAction)
+        
+        alertController.addTextField { tf in
+            tf.addTarget(self, action: #selector(self.newChannelTextFieldValueChanged), for: .editingChanged)
+        }
+        
+        return alertController
+    }()
+    
+    lazy var addChannelAction: UIAlertAction = {
+        let add = UIAlertAction(title: "Create", style: .default) { [weak self] _ in
+            guard let sSelf = self,
+                let name = sSelf.newChannelAlertController.textFields?.first?.text?.trimmed
+                    else { return }
+            
+            sSelf.newChannelAlertController.textFields?.first?.text = nil
+            sSelf.channelsProvider.create(Channel(identifier: "", name: name, lastMessage: nil, lastActivity: nil, ownerId: UIDevice.vendorUid ))
+        }
+        add.isEnabled = false
+        return add
+    }()
+    
+    private let rowHeight = CGFloat(89)
     private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
-    private let numberOfSections = 2
     private let cellIdentifier = ConversationCell.typeName
     private let headerIdentifier = HeaderView.typeName
     
@@ -38,17 +67,17 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     }
     
     private var container: IServiceResolver!
-    private var dataProvider: IConversationsInfoProvider!
     private var themeProvider: IThemeProvider!
+    private var channelsProvider: IChannelsProvider!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
-        self.dataProvider = container.resolve(for: IConversationsInfoProvider.self)
+        self.channelsProvider = container.resolve(for: IChannelsProvider.self)
         self.themeProvider = container.resolve(for: IThemeProvider.self)
     }
     
-    private func configureNavigation(){
-        navigationItem.title = "Tinkoff Chat"
+    private func configureNavigation() {
+        navigationItem.title = "Channels"
         navigationItem.hidesSearchBarWhenScrolling = true
         navigationItem.searchController = UISearchController()
         navigationItem.hidesSearchBarWhenScrolling = true
@@ -58,10 +87,10 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationController?.setupAppearance(with: themeProvider)
     }
     
-    
-    
-    private func setupRightBarButtonItem(){
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: avatarView)
+    private func setupRightBarButtonItem() {
+        let avatarButton = UIBarButtonItem(customView: avatarView)
+        let newChannelButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(presentNewChannelAlert(_:)))
+        navigationItem.rightBarButtonItems = [avatarButton, newChannelButton]
     }
     
     private func setupLeftBarButtonItem() {
@@ -78,12 +107,12 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.leftBarButtonItem = settings
     }
     
-    private func presentConversation(for conversationInfo: IConversationInfo) {
+    private func presentConversation(for channelInfo: Channel) {
         navigationItem.title = nil
         let destination = ConversationViewController.instantiate(container: container)
         let conversationsProvider: IConversationsProvider = container.resolve()
-        let conversation = conversationsProvider.conversation(for: conversationInfo.uid)
-        let viewModel = ConversationViewModel(title: conversationInfo.name, conversation: conversation)
+        let conversation = conversationsProvider.conversation(for: channelInfo.identifier)
+        let viewModel = ConversationViewModel(title: channelInfo.name, conversation: conversation)
         destination.configure(with: viewModel)
         self.show(destination, sender: nil)
     }
@@ -91,10 +120,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     @objc func presentThemeSettings(_ btn: AnyObject) {
         navigationItem.title = nil
         let destination = ThemesViewController.instantiate(container: container)
-        ///comment: RC может возникнуть в случае если два контроллера будут держать сильные ссылки друг на друга
-        ///даже если closure themeChanged будет держать сильную ссылку на ConversationsListViewController
-        ///после того как ThemesViewController закроется ссылка на clsosure обнулиться и следовательно closure будет уничтожена,
-        ///затем счетчик на ConversationsListViewController будет уменьшен
         destination.themeChanged = { [weak self] _ in
             guard let sSelf = self else { return }
             sSelf.setupAppearance()
@@ -102,6 +127,13 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         }
         destination.delegate = self
         self.show(destination, sender: nil)
+    }
+    
+    @objc func presentNewChannelAlert(_ btn: AnyObject) {
+        present(newChannelAlertController, animated: true)
+    }
+    @objc func newChannelTextFieldValueChanged(sender: UITextField) {
+        addChannelAction.isEnabled = !sender.text.isNilOrEmpty
     }
     
     func setupAppearance() {
@@ -155,7 +187,16 @@ extension ConversationsListViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigation()
-        
+        channelsProvider.subscribe { [weak self] in
+            DQ.main.async {
+                self?.tableView.reloadData()
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        channelsProvider.unsubsribe()
     }
     
     ///Updates leading inset of tableViewHeader when screen orientation was changed
@@ -172,16 +213,15 @@ extension ConversationsListViewController {
 }
 
 // MARK: - UITableViewDataSource
-extension ConversationsListViewController: UITableViewDataSource  {
+extension ConversationsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        dataProvider.conversations(for: ConversationType.parse(section)).count
+        channelsProvider.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? ConversationCell
             else { fatalError("Cast to ConversationCell failed.") }
-        cell.configure(with:
-            dataProvider.conversations(for: ConversationType.parse(indexPath.section))[AnyIndex(indexPath.row)])
+        cell.configure(with: channelsProvider.items[indexPath.row])
         cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }
@@ -191,38 +231,14 @@ extension ConversationsListViewController: UITableViewDataSource  {
 // MARK: - UITableViewDelegate
 extension ConversationsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { rowHeight }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        numberOfSections
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: headerIdentifier)
-            as? HeaderView else {
-                fatalError("Cast to HeaderView failed.")
-        }
-        header.configure(with: HeaderModel(title: ConversationType.parse(section).toString(),
-                                           mode: themeProvider.mode,
-                                           theme: themeProvider.value))
-        header.leadingInset = headerLeadingInset
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        headerHeight
-    }
-    
-    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
-        headerHeight
-    }
-    
+        
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
         cell.setSelected(false, animated: true)
         
-        guard let conversationInfo = cell.model
+        guard let channelInfo = cell.model
             else { assert(false, "Unable to unwrap ConversationInfo."); return }
         
-        presentConversation(for: conversationInfo)
+        presentConversation(for: channelInfo)
     }
 }

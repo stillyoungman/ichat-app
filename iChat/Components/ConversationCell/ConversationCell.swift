@@ -9,7 +9,7 @@
 import UIKit
 
 class ConversationCell: UITableViewCell, INibView {
-    private(set) var model: IConversationInfo?
+    private(set) var model: Channel?
     
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var rightChevronView: UIView!
@@ -30,17 +30,18 @@ class ConversationCell: UITableViewCell, INibView {
         }
     }
     
-    private func updateBackroundColor(){
+    // touch `isOnline` to invoke didSet
+    private func updateBackroundColor() {
         isOnline = !(!isOnline)
     }
     
     private let lastMessageFontSize: CGFloat = 13
     private let lineSpacing: CGFloat = 2.5 // lastMessageFontSize + lineSpacing * 2 = 18-required line height
     private lazy var lastMessageDefaultFont = UIFont.systemFont(ofSize: lastMessageFontSize)
-    private lazy var noMessagesFont = UIFont.init(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
+    private lazy var noMessagesFont = UIFont(name: "Arial Rounded MT Bold", size: lastMessageFontSize)
     private let selectedBackroundColor = UIColor.milkGray.withAlphaComponent(0.03)
     
-    private func initialSetup(){
+    private func initialSetup() {
         rightChevronView.addSubview(chevron)
         selectionStyle = .none
     }
@@ -59,7 +60,6 @@ class ConversationCell: UITableViewCell, INibView {
         if mode == .night {
             chevron.tintColor = theme.titnColor
         }
-        
         
         name.textColor = theme.primaryText
         time.textColor = theme.secondaryText
@@ -82,23 +82,22 @@ extension ConversationCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-
+        
         chevron.bounds = CGRect(x: 0, y: 0, width: 10, height: 10)
         chevron.center = CGPoint(x: rightChevronView.bounds.width / 2, y: rightChevronView.bounds.height / 2)
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool)
-    {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
-        if(animated) {
-            UIView.animate(withDuration: 0.1, delay: 1.0, options:[], animations: {
+        
+        if animated {
+            UIView.animate(withDuration: 0.1, delay: 1.0, options: [], animations: {
                 if selected {
                     self.backgroundColor = self.selectedBackroundColor
                 } else {
                     self.updateBackroundColor()
                 }
-            }, completion:nil)
+            }, completion: nil)
         } else {
             if selected {
                 self.backgroundColor = self.selectedBackroundColor
@@ -111,30 +110,33 @@ extension ConversationCell {
 
 // MARK: - IConfigurable
 extension ConversationCell: IConfigurable {
-    typealias ConfigurationModel = IConversationInfo
+    typealias ConfigurationModel = Channel
     
-    func configure(with model: IConversationInfo) {
+    func configure(with model: Channel) {
         self.model = model
         self.name.text = model.name
-        self.isOnline = model.isOnline
+        self.isOnline = false
         
         if model.hasNoMessages {
             self.lastMessage.text = "No messages yet"
             self.lastMessage.font = noMessagesFont
             self.lastMessage.textColor = .black
         } else {
-            self.lastMessage.attributedText = configureLastMessageText(model.message)
-            time.text = model.date.isYesterdayOrEarlier
-                ? model.date.toDaysAndMonthsString()
-                : model.date.toHoursAndMinutesString()
-            if model.hasUnreadMessages { self.lastMessage.font = lastMessageDefaultFont.bold }
+            if let lastMessage = model.lastMessage {
+                self.lastMessage.attributedText = configureLastMessageText(lastMessage)
+            }
+            if let lastActivity = model.lastActivity {
+                time.text = lastActivity.isYesterdayOrEarlier
+                    ? lastActivity.toDaysAndMonthsString()
+                    : lastActivity.toHoursAndMinutesString()
+            }
         }
         
         avatarView.configure(with: AvatarViewModel(username: model.name, image: nil))
         
     }
     
-    func setModel(_ model: IConversationInfo) {
+    func setModel(_ model: Channel) {
         self.model = model
     }
     
@@ -145,7 +147,7 @@ extension ConversationCell: IConfigurable {
         style.lineSpacing = lineSpacing
         
         attributeString.addAttribute(NSAttributedString.Key.paragraphStyle,
-                                     value: style, range: NSMakeRange(0, attributeString.length))
+                                     value: style, range: NSRange(location: 0, length: attributeString.length))
         
         return attributeString
     }

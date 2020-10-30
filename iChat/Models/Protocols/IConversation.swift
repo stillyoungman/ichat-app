@@ -9,9 +9,11 @@
 import Foundation
 
 protocol IConversation {
-    var uid: String { get }
-    var messages: Dictionary<Date, Array<IMessage>> { get }
-    var dates: Array<Date> { get }
-    func getDate(for indexPath: IndexPath) -> Date
-    func getMessage(for indexPath: IndexPath) -> IMessage
+    var channelUid: String { get }
+    var messages: [IMessage] { get }
+    
+    func send(_ content: String, from user: String)
+    
+    func subscribe(_ messagesChangedHandler: @escaping () -> Void)
+    func unsubscribe()
 }

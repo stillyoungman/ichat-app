@@ -9,5 +9,5 @@
 import Foundation
 
 protocol IGroupConversation: IConversation {
-    var participants: Array<IUserInfo> { get }
+    var participants: [IUserInfo] { get }
 }

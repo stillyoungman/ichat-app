@@ -8,12 +8,11 @@
 
 import Foundation
 
-
 enum ConversationType: Int {
     case undefined = -1, online = 0, history = 1
     
     static func parse(_ rawValue: Int) -> ConversationType {
-        ConversationType.init(rawValue: rawValue) ?? ConversationType.undefined
+        ConversationType(rawValue: rawValue) ?? ConversationType.undefined
     }
     
     func toString() -> String {
