@@ -52,9 +52,16 @@ class FirebaseConversation: IConversation {
             "created": Firebase.Timestamp()
         ]
         
-        messagesCollection.addDocument(data: message) { [weak self] err in
-            if err == nil {
-                self?.channel.setData(["lastMessage": content], merge: true)
+        // check if channel is still alive
+        channel.getDocument { [weak self] channelRef, err in
+            guard let channelRef = channelRef, err == nil else { return }
+            
+            if channelRef.exists {
+                self?.messagesCollection.addDocument(data: message) { err in
+                    if err == nil {
+                        self?.channel.setData(["lastMessage": content], merge: true)
+                    }
+                }
             }
         }
     }
