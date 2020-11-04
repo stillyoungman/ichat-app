@@ -10,33 +10,5 @@ import Foundation
 import CoreData
 
 protocol IPersistentStorage {
-    func performSave(_ populate: (NSManagedObjectContext) -> Void)
-}
-
-extension IPersistentStorage {
-    func persist(_ channels: [Channel]) {
-        self.performSave {
-            for channel in channels {
-                debug { sleep(1) }
-                _ = NSManagedChannel(channel, of: $0)
-            }
-        }
-    }
-    
-    func persist(_ messages: [Message], of channelUid: String) {
-        self.performSave {
-            let fetchRequest = NSManagedChannel.fetchRequest()
-            fetchRequest.predicate = NSPredicate(format: "%K == %@", #keyPath(NSManagedChannel.identifier), channelUid)
-            do {
-                guard let channel = (try $0.fetch(fetchRequest) as? [NSManagedChannel])?.first else { return }
-                for message in messages {
-                    debug { sleep(1) }
-                    let message = NSManagedMessage(message, of: $0)
-                    message.channel = channel
-                }
-            } catch {
-                assertionFailure(error.localizedDescription)
-            }
-        }
-    }
+    func save(_ modifyContext: (NSManagedObjectContext) -> Void, _ afterSave: (() -> Void)?)
 }

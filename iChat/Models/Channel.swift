@@ -8,12 +8,20 @@
 
 import Foundation
 
-struct Channel {
+struct Channel: IChannel {
     let identifier: String
     let name: String
     let lastMessage: String?
     let lastActivity: Date?
     let ownerId: String?
+}
+
+protocol IChannel {
+    var identifier: String { get }
+    var name: String { get }
+    var lastMessage: String? { get }
+    var lastActivity: Date? { get }
+    var ownerId: String? { get }
 }
 
 extension Channel {
@@ -28,13 +36,13 @@ extension Channel {
     }
 }
 
-extension Channel {
+extension IChannel {
     var hasNoMessages: Bool {
         self.lastMessage == nil
-//            || self.lastMessage?.trimmingCharacters(in: .whitespacesAndNewlines).count == 0
+        //            || self.lastMessage?.trimmingCharacters(in: .whitespacesAndNewlines).count == 0
     }
     
-    func sortByMessageAvailability(_ second: Channel) -> Bool? {
+    func sortByMessageAvailability(_ second: IChannel) -> Bool? {
         //if first has no message -> it has lower score
         if self.hasNoMessages { return false }
         
@@ -44,7 +52,7 @@ extension Channel {
         return nil
     }
     
-    func sortByLastActivity(_ second: Channel) -> Bool? {
+    func sortByLastActivity(_ second: IChannel) -> Bool? {
         if let selfDate = self.lastActivity, let secondDate = second.lastActivity {
             return selfDate > secondDate
         }
