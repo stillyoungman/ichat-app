@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 class ConversationsListViewController: UIViewController, IStoryboardViewController, UINavigationControllerDelegate {
     @IBOutlet private var tableView: UITableView!

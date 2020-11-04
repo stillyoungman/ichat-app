@@ -8,11 +8,11 @@
 
 import Foundation
 
-protocol IServiceResolver {
+public protocol IServiceResolver {
     func resolve<T>(for type: T.Type) -> T
 }
 
-extension IServiceResolver {
+public extension IServiceResolver {
     func resolve<T>() -> T {
         resolve(for: T.self)
     }

@@ -8,6 +8,7 @@
 
 import Foundation
 import Firebase
+import iChatLib
 
 class ChannelsProvider {
     static let shared = ChannelsProvider()

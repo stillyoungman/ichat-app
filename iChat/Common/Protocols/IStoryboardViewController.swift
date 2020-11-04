@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 protocol IStoryboardViewController {
     func setupDependencies(with container: IServiceResolver)

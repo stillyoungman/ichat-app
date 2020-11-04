@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 class Bootstrapper {
     private init() { }
