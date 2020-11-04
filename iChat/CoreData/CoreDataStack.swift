@@ -66,11 +66,10 @@ class CoreDataStack: IPersistentStorage {
     }
     
     // MARK: - Contexts
-    
     private lazy var writerContext: NSManagedObjectContext = {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.persistentStoreCoordinator = persistentStoreCoordinator
-        context.mergePolicy = NSOverwriteMergePolicy
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return context
     }()
     
@@ -78,7 +77,6 @@ class CoreDataStack: IPersistentStorage {
         let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         context.automaticallyMergesChangesFromParent = true
         context.parent = writerContext
-        context.mergePolicy = NSOverwriteMergePolicy
         return context
     }()
     
@@ -86,8 +84,7 @@ class CoreDataStack: IPersistentStorage {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.name = "saveContext"
         context.automaticallyMergesChangesFromParent = false
-        context.parent = mainContext
-        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        context.parent = writerContext
         return context
     }
     
@@ -96,24 +93,12 @@ class CoreDataStack: IPersistentStorage {
         let context = saveContext()
         modifyContext(context)
         
-        if context.hasChanges {
-            context.performAndWait { [weak self] in
-                do {
-                    try context.obtainPermanentIDs(for: Array(context.registeredObjects))
-                    try context.save()
-                    
-                    guard let sSelf = self else { return }
-                    sSelf.mainContext.performSave()
-                    afterSave?()
-                } catch {
-                    assertionFailure(error.localizedDescription)
-                }
-            }
-        }
+        context.performSave()
+        writerContext.performSave()
+        afterSave?()
     }
     
     // MARK: - Observers and Logs
-    
     func enableObservers() {
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self,

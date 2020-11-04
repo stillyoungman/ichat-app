@@ -12,12 +12,14 @@
 		AD00188D254AA57A00187844 /* UIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD00188C254AA57A00187844 /* UIViewController.swift */; };
 		AD00188F254AA6A600187844 /* ControllersFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD00188E254AA6A600187844 /* ControllersFactory.swift */; };
 		AD011194252CC7C9008180AF /* SpeechBubblePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD011193252CC7C9008180AF /* SpeechBubblePath.swift */; };
+		AD16C7A9255A8791000B4320 /* NSFetchedResultsController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD16C7A8255A8791000B4320 /* NSFetchedResultsController+Extensions.swift */; };
 		AD38A778252E0B2900A81ED5 /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD38A777252E0B2900A81ED5 /* ConversationViewModel.swift */; };
 		AD38A77D252E0CA500A81ED5 /* IConversationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD38A77C252E0CA500A81ED5 /* IConversationProvider.swift */; };
 		AD38A781252E187700A81ED5 /* ProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD38A780252E187700A81ED5 /* ProfileInfo.swift */; };
 		AD3ABBD5254DAEE80035127B /* ConversationsListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3ABBD4254DAEE80035127B /* ConversationsListPresenter.swift */; };
 		AD3E917B2551BB3A0064A87D /* ChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3E917A2551BB3A0064A87D /* ChangeType.swift */; };
 		AD3F03F5252E261000920C2A /* IConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3F03F4252E261000920C2A /* IConversationViewModel.swift */; };
+		AD40B1862553492A00CB07A2 /* IChannelsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD40B1852553492A00CB07A2 /* IChannelsManager.swift */; };
 		AD47F2F7251B862D00F9DDF5 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD47F2F6251B862D00F9DDF5 /* UIImageView.swift */; };
 		AD47F2F9251BA35600F9DDF5 /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD47F2F8251BA35600F9DDF5 /* UILabel.swift */; };
 		AD47F2FE251BB48400F9DDF5 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD47F2FD251BB48400F9DDF5 /* UIImage.swift */; };
@@ -194,12 +196,14 @@
 		AD00188C254AA57A00187844 /* UIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewController.swift; sourceTree = "<group>"; };
 		AD00188E254AA6A600187844 /* ControllersFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControllersFactory.swift; sourceTree = "<group>"; };
 		AD011193252CC7C9008180AF /* SpeechBubblePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBubblePath.swift; sourceTree = "<group>"; };
+		AD16C7A8255A8791000B4320 /* NSFetchedResultsController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSFetchedResultsController+Extensions.swift"; sourceTree = "<group>"; };
 		AD38A777252E0B2900A81ED5 /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		AD38A77C252E0CA500A81ED5 /* IConversationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IConversationProvider.swift; sourceTree = "<group>"; };
 		AD38A780252E187700A81ED5 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 		AD3ABBD4254DAEE80035127B /* ConversationsListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsListPresenter.swift; sourceTree = "<group>"; };
 		AD3E917A2551BB3A0064A87D /* ChangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangeType.swift; sourceTree = "<group>"; };
 		AD3F03F4252E261000920C2A /* IConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IConversationViewModel.swift; sourceTree = "<group>"; };
+		AD40B1852553492A00CB07A2 /* IChannelsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IChannelsManager.swift; sourceTree = "<group>"; };
 		AD453CD7255335B700B29E01 /* Container.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		AD453CD92553374A00B29E01 /* IServiceResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IServiceResolver.swift; sourceTree = "<group>"; };
 		AD47F2F6251B862D00F9DDF5 /* UIImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.swift; sourceTree = "<group>"; };
@@ -551,6 +555,7 @@
 				AD711ED32554237400CE639F /* IViewContextProvider.swift */,
 				AD711ED725543A9700CE639F /* IManaged.swift */,
 				AD711ED5255423C000CE639F /* NSManagedObjectContext+Extensions.swift */,
+				AD16C7A8255A8791000B4320 /* NSFetchedResultsController+Extensions.swift */,
 				AD80EF7F254A496800B6AAA1 /* Chat.xcdatamodeld */,
 			);
 			path = CoreData;
@@ -617,6 +622,7 @@
 				ADB5EEF5252E19D800839CB7 /* IProfileInfoProvider.swift */,
 				AD794B6F2540CDF2005F61DE /* IChannelsProvider.swift */,
 				AD711ECF2553F3D000CE639F /* ILogger.swift */,
+				AD40B1852553492A00CB07A2 /* IChannelsManager.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -1207,6 +1213,7 @@
 				ADC0F22E25239E350050B0D8 /* UIFont.swift in Sources */,
 				AD6DF91A254C58DF004717B3 /* ConversationCell+Extensions.swift in Sources */,
 				AD3E917B2551BB3A0064A87D /* ChangeType.swift in Sources */,
+				AD40B1862553492A00CB07A2 /* IChannelsManager.swift in Sources */,
 				ADD453F12522DC58006722D7 /* ConversationInfo.swift in Sources */,
 				ADAB629D252E68320059616E /* HeaderModel.swift in Sources */,
 				ADE850A72524BD6A0017C3C9 /* IConversationInfo+Utils.swift in Sources */,
@@ -1220,6 +1227,7 @@
 				ADAE8D7C253F5C7000D4A3C7 /* AvatarState.swift in Sources */,
 				AD691745252B825D00807E20 /* TextMessage.swift in Sources */,
 				ADCAFBBB252ADF3B00DCF840 /* Array+Utils.swift in Sources */,
+				AD16C7A9255A8791000B4320 /* NSFetchedResultsController+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

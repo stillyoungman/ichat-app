@@ -19,13 +19,6 @@ class DataFlowManager {
     var channelsSubscription: IDisposable!
     let logger: ILogger?
     
-    var syncDone = false
-    var firstUploadDone = false
-    
-    var isInitialSetupPerformed: Bool {
-        syncDone && firstUploadDone
-    }
-    
     init(channelsProvider: IChannelsProvider, persistence: IPersistentStorage, logger: ILogger? = nil) {
         self.channelsProvider = channelsProvider
         self.persistence = persistence
@@ -53,12 +46,7 @@ class DataFlowManager {
                     context.delete(channel)
                 }
             }
-            
-            // update existed
-            for channel in channels {
-                context.insert(NSManagedChannel(channel, of: context))
-            }
-        }, { [weak self] in self?.syncDone = true })
+        }, nil)
         
         logger?.logEnd()
     }
@@ -76,7 +64,7 @@ class DataFlowManager {
             // update channels
             let toUpdate = changes.filter { $0.isUpdated }.map { $0.value }
             if toUpdate.any { updateIn(context, channels: toUpdate) }
-        }, { [weak self] in self?.firstUploadDone = true })
+        }, nil)
     }
     
     func fetchByIdentifier(_ channels: [Channel]) -> NSFetchRequest<NSFetchRequestResult> {
@@ -120,18 +108,6 @@ class DataFlowManager {
             }
         }
     }
-    
-    func removeChannel() {
-        
-    }
-}
-
-extension DataFlowManager: IDataManager {
-    
-}
-
-protocol IDataManager {
-    var isInitialSetupPerformed: Bool { get }
 }
 
 extension DataFlowManager: IDisposable {
@@ -139,10 +115,4 @@ extension DataFlowManager: IDisposable {
         channelsSubscription.dispose()
         logger?.log("%@: DISPOSE", category: .objectLifetime, .default, String(describing: self))
     }
-}
-
-protocol IChannelsManager {
-    func create(with name: String)
-    func remove(channel: Channel)
-    func rename(_ name: String, channel: Channel)
 }

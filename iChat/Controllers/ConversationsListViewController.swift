@@ -14,7 +14,17 @@ import CoreData
 class ConversationsListViewController: UIViewController, IStoryboardViewController, UINavigationControllerDelegate {
     @IBOutlet private var tableView: UITableView!
     
-    private var channels: [Channel] = []
+    private var container: IServiceResolver!
+    private var themeProvider: IThemeProvider!
+    private var ctxProvider: IViewContextProvider!
+    private var channelsManager: IChannelsManager!
+    
+    func setupDependencies(with container: IServiceResolver) {
+        self.container = container
+        self.themeProvider = container.resolve(for: IThemeProvider.self)
+        self.ctxProvider = container.resolve(for: IViewContextProvider.self)
+        self.channelsManager = container.resolve(for: IChannelsManager.self)
+    }
     
     lazy var avatarView: AvatarView = {
         let aView = AvatarView.fromNib()
@@ -35,10 +45,10 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         }
         
         alertController.addAction(cancel)
-        alertController.addAction(self.addChannelAction)
+        alertController.addAction(addChannelAction)
         
-        alertController.addTextField { tf in
-            tf.addTarget(self, action: #selector(self.newChannelTextFieldValueChanged), for: .editingChanged)
+        alertController.addTextField { [weak self] tf in
+            tf.addTarget(self, action: #selector(self?.newChannelTextFieldValueChanged(sender:)), for: .editingChanged)
         }
         
         return alertController
@@ -50,8 +60,8 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
                 let name = sSelf.newChannelAlertController.textFields?.first?.text?.trimmed
                 else { return }
             
-            //            sSelf.newChannelAlertController.textFields?.first?.text = nil
-            //            sSelf.channelsProvider.create(Channel(identifier: "", name: name, lastMessage: nil, lastActivity: nil, ownerId: UIDevice.vendorUid ))
+            sSelf.newChannelAlertController.textFields?.first?.text = nil
+            sSelf.channelsManager.create(with: name)
         }
         add.isEnabled = false
         return add
@@ -66,12 +76,10 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
                                                          managedObjectContext: ctxProvider.viewContext,
                                                          sectionNameKeyPath: nil,
                                                          cacheName: nil)
-        
         return frc
     }()
     
     private let rowHeight = CGFloat(89)
-    private let headerHeight = CGFloat(89 / 2.5)
     private let tableCellLeadingInset = CGFloat(16)
     private let cellIdentifier = ConversationCell.typeName
     private let headerIdentifier = HeaderView.typeName
@@ -85,18 +93,6 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         return leadingInset
     }
     
-    private var container: IServiceResolver!
-    private var themeProvider: IThemeProvider!
-    private var ctxProvider: IViewContextProvider!
-    private var dataManager: IDataManager!
-    
-    func setupDependencies(with container: IServiceResolver) {
-        self.container = container
-        self.themeProvider = container.resolve(for: IThemeProvider.self)
-        self.ctxProvider = container.resolve(for: IViewContextProvider.self)
-        self.dataManager = container.resolve(for: IDataManager.self)
-    }
-    
     private func configureNavigation() {
         navigationItem.title = "Channels"
         navigationItem.hidesSearchBarWhenScrolling = true
@@ -106,6 +102,24 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.largeTitleDisplayMode = .always
         
         navigationController?.setupAppearance(with: themeProvider)
+    }
+    
+    func configureTableView() {
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.register(ConversationCell.nib, forCellReuseIdentifier: cellIdentifier)
+        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
+        tableView.insetsContentViewsToSafeArea = true
+    }
+    
+    @objc func setupFetchResultsController() {
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            assertionFailure("Unable to perform fetch.")
+        }
+        fetchedResultsController.delegate = self
+        tableView.reloadData()
     }
     
     private func setupRightBarButtonItem() {
@@ -192,28 +206,17 @@ extension ConversationsListViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        do {
-            try fetchedResultsController.performFetch()
-        } catch {
-            assertionFailure("Unable to perform fetch.")
-        }
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.register(ConversationCell.nib, forCellReuseIdentifier: cellIdentifier)
-        tableView.register(HeaderView.self, forHeaderFooterViewReuseIdentifier: headerIdentifier)
-        tableView.insetsContentViewsToSafeArea = true
-        
         configureNavigation()
+        configureTableView()
         setupLeftBarButtonItem()
         setupRightBarButtonItem()
-        
         setupAppearance()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigation()
+        setupFetchResultsController()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -221,17 +224,6 @@ extension ConversationsListViewController {
         fetchedResultsController.delegate = nil
     }
     
-    ///Updates leading inset of tableViewHeader when screen orientation was changed
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        super.viewWillTransition(to: size, with: coordinator)
-        DispatchQueue.main.async {
-            for section in 0 ..< self.tableView.numberOfSections {
-                guard let header = self.tableView.headerView(forSection: section) as? HeaderView
-                    else { continue }
-                header.leadingInset = self.headerLeadingInset
-            }
-        }
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -264,74 +256,71 @@ extension ConversationsListViewController: UITableViewDelegate {
         presentConversation(for: channel)
     }
     
-    //    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-    //
-    //        // should be able to edit
-    //        let channel = channels[indexPath.row]
-    //        if channel.ownerId != UIDevice.vendorUid { return [] }
-    //
-    //        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (_, indexPath) in
-    //            //            self?.channels.remove(at: indexPath.row)
-    //            //            tableView.deleteRows(at: [indexPath], with: .fade)
-    //            //            self?.channelsProvider.remove(channel)
-    //        }
-    //
-    //        //        let edit = UITableViewRowAction(style: .default, title: "Rename") { (action, indexPath) in
-    //        //
-    //        //        }
-    //        //        edit.backgroundColor = UIColor.lightGray
-    //
-    //        return [delete]
-    //
-    //    }
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        // should be able to edit
+        let channel = fetchedResultsController.object(at: indexPath)
+        if channel.ownerId != UIDevice.vendorUid { return [] }
+        
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (_, _) in
+            self?.channelsManager.remove(channel)
+        }
+        
+        //        let edit = UITableViewRowAction(style: .default, title: "Rename") { (action, indexPath) in
+        //
+        //        }
+        //        edit.backgroundColor = UIColor.lightGray
+        
+        return [delete]
+        
+    }
 }
 
 extension ConversationsListViewController: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if dataManager.isInitialSetupPerformed {
-            tableView.beginUpdates()
-        }
+        tableView.beginUpdates()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if dataManager.isInitialSetupPerformed {
-            tableView.endUpdates()
-        } else {
-            tableView.reloadData()
-        }
+        tableView.endUpdates()
     }
     
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-                    didChange anObject: Any,
-                    at indexPath: IndexPath?,
-                    for type: NSFetchedResultsChangeType,
-                    newIndexPath: IndexPath?) {
-        // to avoid awful animation
-        if !dataManager.isInitialSetupPerformed { return }
-        
-        switch type {
-        case .insert:
-            if let indexPath = newIndexPath {
-                tableView.insertRows(at: [indexPath], with: .automatic)
-            }
-        case .update:
-            if let indexPath = indexPath {
-                guard let channel = controller.object(at: indexPath) as? IChannel,
-                    let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
-                cell.configure(with: channel)
-            }
-        case .move:
-            if let indexPath = indexPath {
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-            }
-            if let newIndexPath = newIndexPath {
-                tableView.insertRows(at: [newIndexPath], with: .automatic)
-            }
-        case .delete:
-            if let indexPath = indexPath {
-                tableView.deleteRows(at: [indexPath], with: .automatic)
-            }
-        @unknown default: return
-        }
-    }
+   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                   didChange anObject: Any,
+                   at indexPath: IndexPath?,
+                   for type: NSFetchedResultsChangeType,
+                   newIndexPath: IndexPath?) {
+       
+       // something like bounds check for controller
+       // https://stackoverflow.com/a/25051056/9667748
+       // https://gist.github.com/The0racle/3b6c0e9d8c73c4b1727605117af5e213
+       if let indexPath = indexPath, !controller.hasObject(at: indexPath) {
+           return
+       }
+       
+       switch type {
+       case .insert:
+           if let indexPath = newIndexPath {
+               tableView.insertRows(at: [indexPath], with: .automatic)
+           }
+       case .update:
+           if let indexPath = indexPath {
+               guard let channel = controller.object(at: indexPath) as? IChannel,
+                   let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
+               cell.configure(with: channel)
+           }
+       case .move:
+           if let indexPath = indexPath {
+               tableView.deleteRows(at: [indexPath], with: .automatic)
+           }
+           if let newIndexPath = newIndexPath {
+               tableView.insertRows(at: [newIndexPath], with: .automatic)
+           }
+       case .delete:
+           if let indexPath = indexPath {
+               tableView.deleteRows(at: [indexPath], with: .automatic)
+           }
+       @unknown default: return
+       }
+   }
 }
