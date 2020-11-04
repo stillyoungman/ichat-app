@@ -31,7 +31,8 @@ extension Channel {
         self.identifier = document.id
         self.name = name
         self.lastMessage = data["lastMessage"] as? String
-        self.lastActivity = (data["lastActivity"] as? IDateConvertable)?.date
+        // don't set lastActivity in case last message is nil
+        self.lastActivity = self.lastMessage != nil ? (data["lastActivity"] as? IDateConvertable)?.date : nil
         self.ownerId = data["ownerId"] as? String
     }
 }

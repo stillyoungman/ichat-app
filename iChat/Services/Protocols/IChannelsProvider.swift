@@ -9,11 +9,7 @@
 import Foundation
 import iChatLib
 
-protocol IChannelsProvider {    
-    func create(_ channel: Channel)
-    func remove(_ channel: Channel)
-    func remove(_ channel: Channel, successCallback: (() -> Void)?)
-    
+protocol IChannelsProvider: IChannelsManager {    
     func subscribe(_ channelsChangedHandler: @escaping ([Change<Channel>]) -> Void ) -> IDisposable
     func synchronize(_ completionHandler: @escaping ([Channel]) -> Void)
 }

@@ -32,8 +32,11 @@ class Bootstrapper {
                            IPersistentStorage.self,
                            IViewContextProvider.self) { _ in CoreDataStack.shared }
         
-        container.register(as: .scoped, IChannelsProvider.self, factory: ComponentsFactory.channelsProvider)
-        container.register(as: .scoped, IDataManager.self, factory: ComponentsFactory.applicationDataManager)
+        container.register(as: .scoped,
+                           IChannelsProvider.self,
+                           IChannelsManager.self,
+                           factory: ComponentsFactory.channelsProvider)
+        container.register(as: .scoped, factory: ComponentsFactory.applicationDataManager)
         
         container.register(as: .transient, factory: ControllersFactory.userPageViewController)
         container.register(as: .transient, factory: ControllersFactory.conversationViewController)

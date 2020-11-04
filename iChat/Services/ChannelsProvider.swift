@@ -17,6 +17,12 @@ class ChannelsProvider {
     
     init(logger: ILogger) {
         self.logger = logger
+        
+        // clear cache
+        Firestore.firestore().clearPersistence { if let err = $0 { logger.log("Firebase. %@",
+                                                                              category: .externalServices,
+                                                                              .error,
+                                                                              err.localizedDescription) } }
     }
     
     static func toChangeOf(type: DocumentChangeType, _ doc: IDocument) -> Change<Channel>? {
@@ -55,25 +61,26 @@ extension ChannelsProvider: IChannelsProvider {
     }
     
     func synchronize(_ completionHandler: @escaping ([Channel]) -> Void) {
-        channelsCollection.getDocuments { [weak self] querySnapshot, err in
+        channelsCollection.getDocuments(source: .server) { [weak self] querySnapshot, err in
             if let err = err {
                 self?.logger.log("Firebase. %@", category: .externalServices, .error, err.localizedDescription)
+            } else {
+                guard let querySnapshot = querySnapshot else { return }
+                completionHandler(querySnapshot.documents.compactMap { Channel(with: $0) })
             }
-            
-            guard let querySnapshot = querySnapshot else { return }
-            
-            completionHandler(querySnapshot.documents.compactMap { Channel(with: $0) })
         }
     }
-    
-    private static func sorted(_ channels: [Channel]) -> [Channel] {
-        channels.sorted { first, second in
-            var result: Bool?
-            result = first.sortByMessageAvailability(second)
-            if let result = result { return result }
-            
-            return first.sortByLastActivity(second) ?? false
-        }
+}
+
+extension ChannelsProvider: IChannelsManager {
+    func create(with name: String) {
+        let channel = Channel(identifier: "",
+                              name: name,
+                              lastMessage: nil,
+                              lastActivity: nil,
+                              ownerId: UIDevice.vendorUid )
+        
+        channelsCollection.addDocument(data: channel.data)
     }
     
     func rename(_ name: String, channel: Channel) {
@@ -90,21 +97,9 @@ extension ChannelsProvider: IChannelsProvider {
         }
     }
     
-    func create(_ channel: Channel) {
-        channelsCollection.addDocument(data: channel.data)
-    }
-    
-    func remove(_ channel: Channel) {
-        remove(channel, successCallback: nil)
-    }
-    
-    func remove(_ channel: Channel, successCallback: (() -> Void)?) {
+    func remove(_ channel: IChannel) {
         channelsCollection
             .document(channel.identifier)
-            .delete { err in
-                if err == nil {
-                    successCallback?()
-                }
+            .delete()
         }
-    }
 }
