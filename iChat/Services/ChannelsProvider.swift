@@ -11,37 +11,58 @@ import Firebase
 import iChatLib
 
 class ChannelsProvider {
-    static let shared = ChannelsProvider()
-    
     lazy var db = Firestore.firestore()
     lazy var channelsCollection = db.collection("channels")
-    var channelsChangedListener: ListenerRegistration?
+    let logger: ILogger
     
-    var items: [Channel] = []
+    init(logger: ILogger) {
+        self.logger = logger
+    }
     
-    private init() {
-        channelsCollection.getDocuments { [weak self] (querySnapshot, err) in
-            if let err = err {
-                print("Error getting channels: \(err)")
-            } else {
-                self?.items = ChannelsProvider.sorted(querySnapshot?.documents.compactMap({ Channel(with: $0) }) ?? [])
-            }
+    static func toChangeOf(type: DocumentChangeType, _ doc: IDocument) -> Change<Channel>? {
+        guard let channel = Channel(with: doc) else { return nil }
+        switch type {
+        case .added: return .created(channel)
+        case .modified: return .updated(channel)
+        case .removed: return .deleted(channel)
         }
+    }
+    
+    deinit {
+        logger.log("%@: DEINIT", category: .objectLifetime, .default, String(describing: self))
     }
 }
 
 extension ChannelsProvider: IChannelsProvider {
-    func subscribe(_ channelsChangedHandler: @escaping () -> Void) {
-        if channelsChangedListener != nil { channelsChangedListener?.remove() }
+    func subscribe(_ channelsChangedHandler: @escaping ([Change<Channel>]) -> Void ) -> IDisposable {
+        let listenerRegistration = channelsCollection
+            .addSnapshotListener(includeMetadataChanges: true) { [weak self] querySnapshot, err in
+                
+                if let err = err {
+                    self?.logger.log("Firebase. %@", category: .externalServices, .error, err.localizedDescription)
+                }
+                
+                guard let querySnapshot = querySnapshot else { return }
+                
+                let changes: [Change<Channel>] = querySnapshot.documentChanges(includeMetadataChanges: true)
+                    .compactMap { ChannelsProvider.toChangeOf(type: $0.type, $0.document) }
+                
+                channelsChangedHandler(changes)
+        }
         
-        channelsChangedListener = channelsCollection.addSnapshotListener { [weak self] querySnapshot, err in
+        logger.log("%@: SUBSCRIPTION", category: .objectLifetime, .default, String(describing: self))
+        return Disposable { listenerRegistration.remove() }
+    }
+    
+    func synchronize(_ completionHandler: @escaping ([Channel]) -> Void) {
+        channelsCollection.getDocuments { [weak self] querySnapshot, err in
             if let err = err {
-                print(err.localizedDescription)
-            } else {
-                guard let sSelf = self else { return }
-                sSelf.items = ChannelsProvider.sorted(querySnapshot?.documents.compactMap({ Channel(with: $0) }) ?? [])
-                channelsChangedHandler()
+                self?.logger.log("Firebase. %@", category: .externalServices, .error, err.localizedDescription)
             }
+            
+            guard let querySnapshot = querySnapshot else { return }
+            
+            completionHandler(querySnapshot.documents.compactMap { Channel(with: $0) })
         }
     }
     
@@ -55,8 +76,18 @@ extension ChannelsProvider: IChannelsProvider {
         }
     }
     
-    func unsubsribe() {
-        channelsChangedListener?.remove()
+    func rename(_ name: String, channel: Channel) {
+        let channelRef = channelsCollection.document(channel.identifier)
+        
+        channelRef.getDocument { channelSnapshot, err in
+            guard let channelSnapshot = channelSnapshot, err != nil else { return }
+            
+            if channelSnapshot.exists {
+                channelRef.updateData([
+                    "name": name
+                ])
+            }
+        }
     }
     
     func create(_ channel: Channel) {
@@ -64,8 +95,16 @@ extension ChannelsProvider: IChannelsProvider {
     }
     
     func remove(_ channel: Channel) {
+        remove(channel, successCallback: nil)
+    }
+    
+    func remove(_ channel: Channel, successCallback: (() -> Void)?) {
         channelsCollection
             .document(channel.identifier)
-            .delete()
+            .delete { err in
+                if err == nil {
+                    successCallback?()
+                }
+        }
     }
 }

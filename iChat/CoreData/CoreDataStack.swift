@@ -70,7 +70,7 @@ class CoreDataStack: IPersistentStorage {
     private lazy var writerContext: NSManagedObjectContext = {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.persistentStoreCoordinator = persistentStoreCoordinator
-        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+        context.mergePolicy = NSOverwriteMergePolicy
         return context
     }()
     
@@ -78,39 +78,38 @@ class CoreDataStack: IPersistentStorage {
         let context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         context.automaticallyMergesChangesFromParent = true
         context.parent = writerContext
-        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+        context.mergePolicy = NSOverwriteMergePolicy
         return context
     }()
     
     private func saveContext() -> NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.automaticallyMergesChangesFromParent = true
+        context.name = "saveContext"
+        context.automaticallyMergesChangesFromParent = false
         context.parent = mainContext
-        context.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         return context
     }
     
     // MARK: - Save
-    
-    func performSave(_ populate: (NSManagedObjectContext) -> Void) {
+    func save(_ modifyContext: (NSManagedObjectContext) -> Void, _ afterSave: (() -> Void)?) {
         let context = saveContext()
-        context.performAndWait {
-            populate(context)
-            if context.hasChanges {
-                performSave(in: context)
+        modifyContext(context)
+        
+        if context.hasChanges {
+            context.performAndWait { [weak self] in
+                do {
+                    try context.obtainPermanentIDs(for: Array(context.registeredObjects))
+                    try context.save()
+                    
+                    guard let sSelf = self else { return }
+                    sSelf.mainContext.performSave()
+                    afterSave?()
+                } catch {
+                    assertionFailure(error.localizedDescription)
+                }
             }
         }
-    }
-    
-    private func performSave(in context: NSManagedObjectContext) {
-        context.performAndWait {
-            do {
-                try context.save()
-            } catch {
-                assertionFailure(error.localizedDescription)
-            }
-        }
-        if let parent = context.parent { performSave(in: parent) }
     }
     
     // MARK: - Observers and Logs
@@ -123,8 +122,7 @@ class CoreDataStack: IPersistentStorage {
                                        object: mainContext)
     }
     
-    @objc
-    private func contextObjectsDidChange(notification: NSNotification) {
+    @objc private func contextObjectsDidChange(notification: NSNotification) {
         guard let userInfo = notification.userInfo else { return }
         
         if let inserts = userInfo[NSInsertedObjectsKey] as? Set<NSManagedObject>,
@@ -160,4 +158,8 @@ class CoreDataStack: IPersistentStorage {
             }
         }
     }
+}
+
+extension CoreDataStack: IViewContextProvider {
+    var viewContext: NSManagedObjectContext { mainContext }
 }

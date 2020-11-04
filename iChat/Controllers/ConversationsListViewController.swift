@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import iChatLib
+import CoreData
 
 class ConversationsListViewController: UIViewController, IStoryboardViewController, UINavigationControllerDelegate {
     @IBOutlet private var tableView: UITableView!
@@ -25,7 +26,9 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     }()
     
     lazy var newChannelAlertController: UIAlertController = {
-        let alertController = UIAlertController(title: "New channel", message: "Please, enter name of the channel:", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "New channel",
+                                                message: "Please, enter name of the channel:",
+                                                preferredStyle: .alert)
         
         let cancel = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             alertController.textFields?.first?.text = nil
@@ -45,13 +48,26 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         let add = UIAlertAction(title: "Create", style: .default) { [weak self] _ in
             guard let sSelf = self,
                 let name = sSelf.newChannelAlertController.textFields?.first?.text?.trimmed
-                    else { return }
+                else { return }
             
-            sSelf.newChannelAlertController.textFields?.first?.text = nil
-            sSelf.channelsProvider.create(Channel(identifier: "", name: name, lastMessage: nil, lastActivity: nil, ownerId: UIDevice.vendorUid ))
+            //            sSelf.newChannelAlertController.textFields?.first?.text = nil
+            //            sSelf.channelsProvider.create(Channel(identifier: "", name: name, lastMessage: nil, lastActivity: nil, ownerId: UIDevice.vendorUid ))
         }
         add.isEnabled = false
         return add
+    }()
+    
+    lazy var fetchedResultsController: NSFetchedResultsController<NSManagedChannel> = {
+        let fetchRequest = NSManagedChannel.fetchRequest
+        let timeDescriptor = NSSortDescriptor(key: "lastActivity", ascending: false)
+        fetchRequest.sortDescriptors = [timeDescriptor]
+        let frc: NSFetchedResultsController =
+            NSFetchedResultsController<NSManagedChannel>(fetchRequest: fetchRequest,
+                                                         managedObjectContext: ctxProvider.viewContext,
+                                                         sectionNameKeyPath: nil,
+                                                         cacheName: nil)
+        
+        return frc
     }()
     
     private let rowHeight = CGFloat(89)
@@ -71,14 +87,14 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     private var container: IServiceResolver!
     private var themeProvider: IThemeProvider!
-    private var channelsProvider: IChannelsProvider!
-    private var storage: IPersistentStorage!
+    private var ctxProvider: IViewContextProvider!
+    private var dataManager: IDataManager!
     
     func setupDependencies(with container: IServiceResolver) {
         self.container = container
-        self.channelsProvider = container.resolve(for: IChannelsProvider.self)
         self.themeProvider = container.resolve(for: IThemeProvider.self)
-        self.storage = container.resolve(for: IPersistentStorage.self)
+        self.ctxProvider = container.resolve(for: IViewContextProvider.self)
+        self.dataManager = container.resolve(for: IDataManager.self)
     }
     
     private func configureNavigation() {
@@ -94,7 +110,9 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
     
     private func setupRightBarButtonItem() {
         let avatarButton = UIBarButtonItem(customView: avatarView)
-        let newChannelButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(presentNewChannelAlert(_:)))
+        let newChannelButton = UIBarButtonItem(barButtonSystemItem: .add,
+                                               target: self,
+                                               action: #selector(presentNewChannelAlert(_:)))
         navigationItem.rightBarButtonItems = [avatarButton, newChannelButton]
     }
     
@@ -112,7 +130,7 @@ class ConversationsListViewController: UIViewController, IStoryboardViewControll
         navigationItem.leftBarButtonItem = settings
     }
     
-    private func presentConversation(for channel: Channel) {
+    private func presentConversation(for channel: IChannel) {
         navigationItem.title = nil
         let conversationVC: ConversationViewController = container.resolve()
         conversationVC.configure(with: channel)
@@ -156,12 +174,15 @@ extension ConversationsListViewController: AvatarViewDelegate {
     }
     
     private func presentUserPageController() {
+        // instantiate vc
         let userPageVC: UserPageViewController = container.resolve()
         
+        // setup callbacks
         userPageVC.profileHasBeenChanged = { [weak self] p in
             DQ.main.async { self?.avatarView.image = p.image }
         }
         
+        // present
         self.present(userPageVC.forPresentation, animated: true)
     }
 }
@@ -170,6 +191,13 @@ extension ConversationsListViewController: AvatarViewDelegate {
 extension ConversationsListViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            assertionFailure("Unable to perform fetch.")
+        }
+        
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(ConversationCell.nib, forCellReuseIdentifier: cellIdentifier)
@@ -186,21 +214,11 @@ extension ConversationsListViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         configureNavigation()
-        channelsProvider.subscribe { [weak self] in
-            guard let sSelf = self else { return }
-            DQ.global(qos: .utility).async {
-                sSelf.storage.persist(sSelf.channelsProvider.items)
-            }
-            sSelf.channels = sSelf.channelsProvider.items
-            DQ.main.async {
-                sSelf.tableView.reloadData()
-            }
-        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        channelsProvider.unsubsribe()
+        fetchedResultsController.delegate = nil
     }
     
     ///Updates leading inset of tableViewHeader when screen orientation was changed
@@ -219,13 +237,14 @@ extension ConversationsListViewController {
 // MARK: - UITableViewDataSource
 extension ConversationsListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        channels.count
+        fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) as? ConversationCell
             else { fatalError("Cast to ConversationCell failed.") }
-        cell.configure(with: channels[indexPath.row])
+        let channel = fetchedResultsController.object(at: indexPath)
+        cell.configure(with: channel)
         cell.apply(themeProvider.value, for: themeProvider.mode)
         return cell
     }
@@ -234,35 +253,85 @@ extension ConversationsListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension ConversationsListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { rowHeight }
-        
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
         cell.setSelected(false, animated: true)
         
-        guard let channelInfo = cell.model
-            else { assert(false, "Unable to unwrap ConversationInfo."); return }
+        guard let channel = cell.model
+            else { assertionFailure("Unable to unwrap ConversationInfo."); return }
         
-        presentConversation(for: channelInfo)
+        presentConversation(for: channel)
     }
     
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+    //    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+    //
+    //        // should be able to edit
+    //        let channel = channels[indexPath.row]
+    //        if channel.ownerId != UIDevice.vendorUid { return [] }
+    //
+    //        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (_, indexPath) in
+    //            //            self?.channels.remove(at: indexPath.row)
+    //            //            tableView.deleteRows(at: [indexPath], with: .fade)
+    //            //            self?.channelsProvider.remove(channel)
+    //        }
+    //
+    //        //        let edit = UITableViewRowAction(style: .default, title: "Rename") { (action, indexPath) in
+    //        //
+    //        //        }
+    //        //        edit.backgroundColor = UIColor.lightGray
+    //
+    //        return [delete]
+    //
+    //    }
+}
 
-        // should be able to edit
-        let channel = channels[indexPath.row]
-        if channel.ownerId != UIDevice.vendorUid { return [] }
-    
-        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { [weak self] (_, indexPath) in
-            self?.channels.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            self?.channelsProvider.remove(channel)
+extension ConversationsListViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if dataManager.isInitialSetupPerformed {
+            tableView.beginUpdates()
         }
-
-//        let edit = UITableViewRowAction(style: .default, title: "Rename") { (action, indexPath) in
-//
-//        }
-//        edit.backgroundColor = UIColor.lightGray
-
-        return [delete]
-
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if dataManager.isInitialSetupPerformed {
+            tableView.endUpdates()
+        } else {
+            tableView.reloadData()
+        }
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
+                    didChange anObject: Any,
+                    at indexPath: IndexPath?,
+                    for type: NSFetchedResultsChangeType,
+                    newIndexPath: IndexPath?) {
+        // to avoid awful animation
+        if !dataManager.isInitialSetupPerformed { return }
+        
+        switch type {
+        case .insert:
+            if let indexPath = newIndexPath {
+                tableView.insertRows(at: [indexPath], with: .automatic)
+            }
+        case .update:
+            if let indexPath = indexPath {
+                guard let channel = controller.object(at: indexPath) as? IChannel,
+                    let cell = tableView.cellForRow(at: indexPath) as? ConversationCell else { return }
+                cell.configure(with: channel)
+            }
+        case .move:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+            if let newIndexPath = newIndexPath {
+                tableView.insertRows(at: [newIndexPath], with: .automatic)
+            }
+        case .delete:
+            if let indexPath = indexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+        @unknown default: return
+        }
     }
 }

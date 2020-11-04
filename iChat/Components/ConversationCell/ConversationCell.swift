@@ -11,7 +11,7 @@ import UIKit
 class ConversationCell: UITableViewCell {
     static var _appContext: ApplicationContext?
     
-    private(set) var model: Channel!
+    private(set) var model: IChannel!
     
     @IBOutlet weak var avatarView: AvatarView!
     @IBOutlet weak var rightChevronView: UIView!
@@ -106,9 +106,9 @@ extension ConversationCell {
 
 // MARK: - IConfigurable
 extension ConversationCell: IConfigurable {
-    typealias ConfigurationModel = Channel
+    typealias ConfigurationModel = IChannel
     
-    func configure(with model: Channel) {
+    func configure(with model: IChannel) {
         self.model = model
         self.name.text = model.name
         setBackroundColor()
@@ -132,7 +132,7 @@ extension ConversationCell: IConfigurable {
         
     }
     
-    func setModel(_ model: Channel) {
+    func setModel(_ model: IChannel) {
         self.model = model
     }
     
