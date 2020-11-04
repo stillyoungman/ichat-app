@@ -67,17 +67,6 @@ protocol IContainer: IServiceResolver {
     func register<T>(_ singletonInstance: T)
 }
 
-protocol IServiceResolver {
-    /// register as Singleton
-    func resolve<T>(for type: T.Type) -> T
-}
-
-extension IServiceResolver {
-    func resolve<T>() -> T {
-        resolve(for: T.self)
-    }
-}
-
 extension IContainer {
     func register<T>(factory method: @escaping (IContainer) -> T) {
         /// register as PerRequest instance
