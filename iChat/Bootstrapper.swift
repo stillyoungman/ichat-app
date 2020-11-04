@@ -28,6 +28,7 @@ class Bootstrapper {
         
         container.register(for: .perRequest, factory: ControllersFactory.userPageViewController)
         container.register(for: .perRequest, factory: ControllersFactory.conversationViewController)
+        container.register(for: .perRequest, factory: ControllersFactory.conversationsListViewController)
     }
     
     static func initApplication(_ window: UIWindow) {
@@ -35,6 +36,7 @@ class Bootstrapper {
         
         window.rootViewController = AppNavigationViewController.create(withRoot: ConversationsListViewController.instantiate(container: container))
         
+        window.rootViewController = container.resolve(for: ConversationsListViewController.self).forPresentation
         window.makeKeyAndVisible()
     }
     
