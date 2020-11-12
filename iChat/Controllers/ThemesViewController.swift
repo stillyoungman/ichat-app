@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 class ThemesViewController: UIViewController, IStoryboardViewController {
     @IBOutlet private var buttons: [UIButton]!

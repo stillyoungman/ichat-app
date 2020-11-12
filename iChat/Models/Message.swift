@@ -14,11 +14,10 @@ struct Message {
     let created: Date
     let senderId: String
     let senderName: String
-    let deviceUid: String
 }
 
 extension Message {
-    init?(with document: IDocument, deviceUid: String) {
+    init?(with document: IDocument) {
         let data = document.data()
         if let content = data["content"] as? String,
         let created = (data["created"] as? IDateConvertable)?.date,
@@ -30,7 +29,6 @@ extension Message {
             self.senderId = senderId
             self.senderName = data["senderName"] as? String ?? "*Unkown*"
             self.identifier = document.id
-            self.deviceUid = deviceUid
         } else {
             return nil
         }

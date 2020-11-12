@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 class ConversationViewController: GuidedViewController, IStoryboardViewController, IConfigurable {
     lazy var tableView: UITableView = {
@@ -46,18 +47,18 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
     
     var themeManager: IThemeProvider!
     var profileProvider: IProfileInfoProvider!
-    var storage: IPersistentStorage!
+//    var storage: IPersistentStorage!
     var conversationProvider: IConversationsProvider!
     var conversation: IConversation!
     
     func setupDependencies(with container: IServiceResolver) {
         themeManager = container.resolve(for: IThemeProvider.self)
         profileProvider = container.resolve(for: IProfileInfoProvider.self)
-        storage = container.resolve(for: IPersistentStorage.self)
+//        storage = container.resolve(for: IPersistentStorage.self)
         conversationProvider = container.resolve(for: IConversationsProvider.self)
     }
     
-    func configure(with channel: Channel) {
+    func configure(with channel: IChannel) {
         self.title = channel.name
         conversation = conversationProvider.conversation(for: channel.identifier)
     }
@@ -78,9 +79,9 @@ class ConversationViewController: GuidedViewController, IStoryboardViewControlle
             guard let sSelf = self else { return }
             
             DQ.global(qos: .utility).async {
-                let channelUid = sSelf.conversation.channelUid
-                let messages = sSelf.conversation.messages
-                sSelf.storage.persist(messages, of: channelUid)
+//                let channelUid = sSelf.conversation.channelUid
+//                let messages = sSelf.conversation.messages
+//                sSelf.storage.persist(messages, of: channelUid)
             }
             
             sSelf.tableView.reloadData()

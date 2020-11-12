@@ -7,12 +7,9 @@
 //
 
 import Foundation
+import iChatLib
 
-protocol IChannelsProvider {
-    var items: [Channel] { get }
-    
-    func create(_ channel: Channel)
-    
-    func subscribe(_ channelsChangedHandler: @escaping () -> Void)
-    func unsubsribe()
+protocol IChannelsProvider: IChannelsManager {    
+    func subscribe(_ channelsChangedHandler: @escaping ([Change<Channel>]) -> Void ) -> IDisposable
+    func synchronize(_ completionHandler: @escaping ([Channel]) -> Void)
 }

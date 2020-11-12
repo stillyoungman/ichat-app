@@ -58,7 +58,7 @@ import UIKit
         }
     }
     private let emptyThumbnailColor = UIColor(hex: "E4E82B") ?? .yellow
-    var delegate: AvatarViewDelegate?
+    weak var delegate: AvatarViewDelegate?
     
     private func baseSetup() {
         cornerRadius = bounds.width / 2

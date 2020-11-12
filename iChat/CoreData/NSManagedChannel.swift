@@ -9,7 +9,7 @@
 import Foundation
 import CoreData
 
-class NSManagedChannel: NSManagedObject {
+class NSManagedChannel: NSManagedObject, IChannel, IManaged {
     @objc
     private override init(entity: NSEntityDescription, insertInto context: NSManagedObjectContext?) {
         super.init(entity: entity, insertInto: context)
@@ -42,5 +42,11 @@ extension NSManagedChannel {
         lastMessage = channel.lastMessage
         lastActivity = channel.lastActivity
         ownerId = channel.ownerId
+    }
+    
+    func update(with channel: Channel) {
+        self.name = channel.name
+        self.lastActivity = channel.lastActivity
+        self.lastMessage = channel.lastMessage
     }
 }

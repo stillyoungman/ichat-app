@@ -8,9 +8,10 @@
 
 import Foundation
 import UIKit
+import iChatLib
 
 class ControllersFactory {
-    static func userPageViewController(container: IContainer) -> UserPageViewController {
+    static func userPageViewController(container: IServiceResolver) -> UserPageViewController {
         let userPageVC = UserPageViewController()
         userPageVC.setupDependencies(with: container)
         
@@ -23,9 +24,16 @@ class ControllersFactory {
         return userPageVC
     }
     
-    static func conversationViewController(container: IContainer) -> ConversationViewController {
+    static func conversationViewController(container: IServiceResolver) -> ConversationViewController {
         let controller = ConversationViewController()
         controller.setupDependencies(with: container)
+        return controller
+    }
+    
+    static func conversationsListViewController(container: IServiceResolver) -> ConversationsListViewController {
+        let controller = ConversationsListViewController.instantiate(container: container)
+        _ = AppNavigationViewController.create(withRoot: controller)
+        
         return controller
     }
 }

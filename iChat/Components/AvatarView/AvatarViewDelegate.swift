@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol AvatarViewDelegate {
+protocol AvatarViewDelegate: class {
     func viewDidTapped()
 }
 

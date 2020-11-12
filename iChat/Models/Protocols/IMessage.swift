@@ -16,11 +16,11 @@ protocol IMessage {
     var senderUid: String { get }
     var senderName: String { get }
     
-    var deviceUid: String { get }
-    
     var date: Date { get }
 }
 
 extension IMessage {
-    var isOutgoing: Bool { deviceUid == senderUid }
+    func isOutgoing(_ deviceUid: String) -> Bool {
+        deviceUid == senderUid
+    }
 }

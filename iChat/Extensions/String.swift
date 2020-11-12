@@ -6,6 +6,8 @@
 //  Copyright © 2020 Constantine Nikolsky. All rights reserved.
 //
 
+import Foundation
+
 extension String {
     func log() {
         #if ENABLE_CONSOLE_LOGGING
@@ -17,6 +19,13 @@ extension String {
     
     var trimmed: String {
         self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    // makes format string with arguments
+    func formatWithParams(_ args: [CVarArg]) -> String {
+        return withVaList(args) {
+            String(NSString(format: self, arguments: $0))
+        }
     }
 }
 

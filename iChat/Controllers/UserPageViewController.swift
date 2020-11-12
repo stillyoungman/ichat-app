@@ -8,6 +8,7 @@
 
 import UIKit
 import Photos
+import iChatLib
 
 // TODO: Handle avatar save
 // TODO: Add remove image

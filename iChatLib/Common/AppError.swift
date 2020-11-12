@@ -9,5 +9,9 @@
 import Foundation
 
 class AppError: Error {
+    let info: String
     
+    init(_ info: String? = nil) {
+        self.info = info ?? "<<Empty>>"
+    }
 }
